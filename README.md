@@ -62,44 +62,6 @@ Ensure you have the following installed:
     npm install
     ```
 
-3. Ensure the following packages are installed:
-
-- **Express**
-
-   ```sh
-    npm install express
-    ```
-
-- **NodeMon**
-
-   ```sh
-   npm install -g nodemon
-   ```
-
-- **CORS**
-
-   ```sh
-   npm install cors
-   ```
-
-- **Dotenv**
-
-   ```sh
-   npm install dotenv
-   ```
-
-- **MongoDB**
-
-   ```sh
-   npm install mongodb
-   ```
-
-- **@types/node, @types/express, @types/cors** (for TypeScript):
-
-   ```sh
-   npm install -D @types/node @types/express @types/cors
-   ```
-
 ### Web
 
 1. Navigate to the `web` directory:
@@ -113,20 +75,6 @@ Ensure you have the following installed:
    ```sh
     npm install
     ```
-
-3. Ensure the following packages are installed:
-
-- **React**
-
-   ```sh
-    npm install react react-dom
-    ```
-
-- **@types/react, @types/react-dom** (for TypeScript):
-
-   ```sh
-   npm install -D @types/react @types/react-dom
-   ```
 
 ### Mobile
 
@@ -142,23 +90,9 @@ Ensure you have the following installed:
     npm install
     ```
 
-3. Ensure the following packages are installed:
-
-- **React Native**
-
-   ```sh
-    npm install react-native
-    ```
-
-- **React Native Types**
-
-   ```sh
-   npm install @types/react-native
-   ```  
-
 ## Usage
 
-### Backend
+### Backend Server
 
 1. Add your external IP address to the Atlas MongoDB cluster security settings.
 2. Start the backend server:
@@ -171,8 +105,7 @@ Ensure you have the following installed:
 
 3. Access the data at <http://localhost:5000/locations>.
 
-
-### Web
+### Web App
 
 1. Start the web app:
 
@@ -184,7 +117,7 @@ Ensure you have the following installed:
 
 2. Access the web app at <http://localhost:3000/>.
 
-### Mobile
+### Mobile App
 
 1. Start the mobile app:
 
@@ -205,4 +138,3 @@ Ensure you have the following installed:
 ## Configuration
 
 Configuration details should be added to the respective .env files in each directory if needed.
-
