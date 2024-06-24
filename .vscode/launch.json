@@ -5,11 +5,40 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Attach to packager",
-      "cwd": "${workspaceFolder}/TrackerApp",
-      "type": "reactnative",
-      "request": "attach",
-      "isDynamic": true
+      "name": "Debug Backend",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/backend",
+      "program": "${workspaceFolder}/backend/src/index.js",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug Web (React)",
+      "type": "chrome",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/web",
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${webRoot}/src/*"
+      },
+      "env": {
+        "BROWSER": "none"
+      },
+      "preLaunchTask": "start-web-server"
+    },
+    {
+      "name": "Debug Mobile (Expo)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/mobile",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["expo", "start"],
+      "console": "integratedTerminal"
     }
   ]
 }
