@@ -92,6 +92,14 @@ Ensure you have the following installed:
 
 ## Usage
 
+### Database
+
+For the database we're using MongoDB Atlas.
+
+Login is here: <https://account.mongodb.com/account/login>
+
+Use "Sign in with Google" and the CacheMoney613@gmail.com account to log in.
+
 ### Backend Server
 
 1. Add your external IP address to the Atlas MongoDB cluster security settings.
