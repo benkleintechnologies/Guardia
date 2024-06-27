@@ -1,6 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { Auth } from './components/Auth';
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
           Learn React
         </a>
       </header>
+      {/* Temporarily put the Auth component here to check it works */}
+      <Auth></Auth>
     </div>
   );
 }
