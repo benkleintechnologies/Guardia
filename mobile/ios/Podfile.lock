@@ -1405,6 +1405,8 @@ PODS:
     - React-logger (= 0.74.2)
     - React-perflogger (= 0.74.2)
     - React-utils (= 0.74.2)
+  - RNBackgroundFetch (4.2.5):
+    - React-Core
   - RNBackgroundGeolocation (4.16.3):
     - CocoaLumberjack (~> 3.8.5)
     - React-Core
@@ -1553,6 +1555,7 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - RNBackgroundFetch (from `../node_modules/react-native-background-fetch`)
   - RNBackgroundGeolocation (from `../node_modules/react-native-background-geolocation`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
@@ -1712,6 +1715,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNBackgroundFetch:
+    :path: "../node_modules/react-native-background-fetch"
   RNBackgroundGeolocation:
     :path: "../node_modules/react-native-background-geolocation"
   RNCAsyncStorage:
@@ -1800,6 +1805,7 @@ SPEC CHECKSUMS:
   React-runtimescheduler: d2f61c6fd47401f52d220cff22791db1ac7053e0
   React-utils: a4de2ebe8d96dfafd27ffd7c131e7ddca3a386e4
   ReactCommon: f75776d715a088ecb67041eaf50ccdb7e94b245c
+  RNBackgroundFetch: 2f800a04434620db15ede2e8f21886608a2d1743
   RNBackgroundGeolocation: f82cca1ee650ce8db19fd69012b51ab314030740
   RNCAsyncStorage: 826b603ae9c0f88b5ac4e956801f755109fa4d5c
   RNGestureHandler: 9508b860b3709d658dda7a701363a318e329d04b
@@ -1808,6 +1814,6 @@ SPEC CHECKSUMS:
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: ae3c32c514802d30f687a04a6a35b348506d411f
 
-PODFILE CHECKSUM: cbba9d6538cce6912eb5cd72b7c866fbd3606a12
+PODFILE CHECKSUM: e83cdb4f759dadb8d3a061193a7e2ca9834347ab
 
 COCOAPODS: 1.15.2

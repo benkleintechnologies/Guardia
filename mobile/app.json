@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.cachemoney613.EmergencyTeamTracker"
+      "bundleIdentifier": "com.cachemoney613.KitatKonenutTracker"
     },
     "android": {
       "adaptiveIcon": {

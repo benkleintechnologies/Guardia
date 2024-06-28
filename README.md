@@ -50,17 +50,7 @@ Ensure you have the following installed:
 
 ### Backend
 
-1. Navigate to the `backend` directory:
-
-   ```sh
-   cd backend
-   ```
-
-2. Install the dependencies:
-
-   ```sh
-    npm install
-    ```
+None should be needed
 
 ### Web
 
@@ -94,16 +84,7 @@ Ensure you have the following installed:
 
 ### Backend Server
 
-1. Add your external IP address to the Atlas MongoDB cluster security settings.
-2. Start the backend server:
-
-   ```sh
-   npm start
-   ```
-
-   or to debug, go to the run and debug tab in VSCode and select the "Debug Backend" configuration.
-
-3. Access the data at <http://localhost:5000/locations>.
+We're now using Firebase as the backend (for authentication and storing data in Firestore).
 
 ### Web App
 
@@ -127,13 +108,15 @@ Ensure you have the following installed:
 
    or to debug, go to the run and debug tab in VSCode and select the "Debug Mobile (Expo)" configuration.
 
+   Only got iOS to run successfully using `npx react-native run-ios` 
+
 2. Access the mobile app using the Expo Go app on your mobile device by scanning the QR Code (or in a simulator on your device, using one of the other options).
 
 ## Features
 
 - The backend connects to the Atlas MongoDB cluster and retrieves sample data, including locations.
 - The mobile app is a basic React Native app with placeholder code.
-- The web app is built using the MERN stack.
+- The web app is built using React and Typescript.
 
 ## Configuration
 
