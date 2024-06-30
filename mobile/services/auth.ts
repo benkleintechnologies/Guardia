@@ -10,6 +10,7 @@ export const signIn = async (email: string, password: string): Promise<string> =
 
     // Fetch user profile from Firestore
     const userDoc = await getDoc(doc(db, 'users', user.uid));
+    console.log(userDoc);
     if (userDoc.exists()) {
       const userData = userDoc.data();
       await AsyncStorage.setItem('userId', user.uid);  // Store userId locally
@@ -30,7 +31,7 @@ export const signUp = async (email: string, password: string, teamId: string): P
 
     // Add user to Firestore with teamId
     await setDoc(doc(db, 'users', user.uid), {
-      email: user.email,
+      userId: user.uid,
       teamId,
       canViewOthers: false, // Default permission
       role: 'volunteer' // Default role
@@ -45,4 +46,15 @@ export const signUp = async (email: string, password: string, teamId: string): P
     console.error('Error signing up:', error);
     throw error;
   }
+};
+
+export const signOut = async (): Promise<void> => {
+  await AsyncStorage.removeItem('userId');
+  await AsyncStorage.removeItem('teamId');
+  await auth.signOut();
+};
+
+export const checkAuthStatus = async (): Promise<boolean> => {
+  const userId = await AsyncStorage.getItem('userId');
+  return !!userId;
 };

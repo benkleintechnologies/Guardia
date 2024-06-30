@@ -14,7 +14,7 @@ const Map = () => {
     const unsubscribe = onSnapshot(collection(db, 'locations'), (snapshot) => {
       const locationsData = snapshot.docs.map(doc => ({
         id: doc.id,
-        ...(doc.data() as Omit<Location, 'id'>)
+        ...(doc.data() as Location)
       })) as Location[];
       setLocations(locationsData);
     });
