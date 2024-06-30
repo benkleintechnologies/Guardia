@@ -1,30 +1,44 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
-import { signIn, signUp } from '../services/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { signIn as apiSignIn, signUp as apiSignUp } from '../services/auth';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useAuth } from '../hooks/useAuth';
 
-const Auth = ({ setUserId }: { setUserId: (id: string) => void }) => {
+type AuthScreenProps = {
+  navigation: StackNavigationProp<any>;
+};
+
+const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [teamId, setTeamId] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const { signIn, isAuthenticated } = useAuth();
+
+  console.log('Auth component rendering, isAuthenticated:', isAuthenticated);
 
   const handleAuth = async () => {
-    try {
-      let userId;
+    try{ 
+      let userId: string = "";
       if (isSignUp) {
-        userId = await signUp(email, password, teamId);
+          userId = await apiSignUp(email, password, teamId);
+          console.log('Sign up successful, userId:', userId);
       } else {
-        userId = await signIn(email, password);
+          userId = await apiSignIn(email, password);
+          console.log('Sign in successful, userId:', userId);
       }
-      if (userId) {
-        setUserId(userId);
-        await AsyncStorage.setItem('userId', userId);
-      }
+
+      // Use the signIn function from useAuth hook
+      await signIn(userId);
+      console.log('Authentication state updated');
+      console.log('Authentication Successful', `UserId: ${userId}`);
     } catch (error) {
       console.error('Authentication error:', error);
-      // Handle error (show message to user)
+      setError('Authentication failed. Please try again.');
+      Alert.alert('Authentication Error', 'Authentication failed. Please try again.');
     }
   };
 

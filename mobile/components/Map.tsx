@@ -7,7 +7,7 @@ import { collection, onSnapshot } from 'firebase/firestore';
 import { Location } from '../types'; // Import the Location interface
 
 
-const Map = ({ userId }: { userId: string }) => {
+const Map = () => {
   const [locations, setLocations] = useState<Location[]>([]);
 
   useEffect(() => {

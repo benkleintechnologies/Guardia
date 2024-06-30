@@ -12,8 +12,8 @@ export const signIn = async (email: string, password: string): Promise<string> =
     const userDoc = await getDoc(doc(db, 'users', user.uid));
     if (userDoc.exists()) {
       const userData = userDoc.data();
-      // Store teamId locally
-      await AsyncStorage.setItem('teamId', userData.teamId);
+      await AsyncStorage.setItem('userId', user.uid);  // Store userId locally
+      await AsyncStorage.setItem('teamId', userData.teamId);  // Store teamId locally
     }
 
     return user.uid;
@@ -36,8 +36,9 @@ export const signUp = async (email: string, password: string, teamId: string): P
       role: 'volunteer' // Default role
     });
 
-    // Store teamId locally
-    await AsyncStorage.setItem('teamId', teamId);
+    // Store locally
+    await AsyncStorage.setItem('userId', user.uid);  // Store userId
+    await AsyncStorage.setItem('teamId', teamId);  // Store teamId
 
     return user.uid;
   } catch (error) {
