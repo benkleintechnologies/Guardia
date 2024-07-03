@@ -18,10 +18,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  * @param password - User's password
  * @returns Promise resolving to the user's ID
  */
-export const signIn = async (email: string, password: string): Promise<string> => {
+export const signIn = async (email: string, password: string): Promise<[string, string]> => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
+    let teamId = ""
 
     // Fetch user profile from Firestore
     const userDoc = await getDoc(doc(db, 'users', user.uid));
@@ -30,9 +31,10 @@ export const signIn = async (email: string, password: string): Promise<string> =
       const userData = userDoc.data();
       await AsyncStorage.setItem('userId', user.uid);  // Store userId locally
       await AsyncStorage.setItem('teamId', userData.teamId);  // Store teamId locally
+      teamId = userData.teamId;
     }
 
-    return user.uid;
+    return [user.uid, teamId];
   } catch (error) {
     console.error('Error signing in:', error);
     throw error;
@@ -47,7 +49,7 @@ export const signIn = async (email: string, password: string): Promise<string> =
  * @param teamId - User's team ID
  * @returns Promise resolving to the new user's ID
  */
-export const signUp = async (email: string, password: string, teamId: string): Promise<string> => {
+export const signUp = async (email: string, password: string, teamId: string): Promise<[string, string]> => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -64,7 +66,7 @@ export const signUp = async (email: string, password: string, teamId: string): P
     await AsyncStorage.setItem('userId', user.uid);  // Store userId
     await AsyncStorage.setItem('teamId', teamId);  // Store teamId
 
-    return user.uid;
+    return [user.uid, teamId];
   } catch (error) {
     console.error('Error signing up:', error);
     throw error;

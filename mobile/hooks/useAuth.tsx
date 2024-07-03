@@ -7,6 +7,7 @@
 
 import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth } from '../firebase'; // Import Firebase auth
 
 /**
  * Type definition for the authentication context
@@ -14,7 +15,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 type AuthContextType = {
   isAuthenticated: boolean | null;
   userId: string | null;
-  signIn: (newUserId: string) => Promise<void>;
+  teamId: string | null;
+  signIn: (newUserId: string, newTeamId: string) => Promise<void>;
   signOut: () => Promise<void>;
   checkAuthStatus: () => Promise<void>;
 };
@@ -30,6 +32,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [teamId, setTeamId] = useState<string | null>(null);
 
   /**
    * Checks the current authentication status
@@ -38,14 +41,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('Checking auth status...');
     try {
       const storedUserId = await AsyncStorage.getItem('userId');
-      console.log('Stored userId:', storedUserId);
-      setIsAuthenticated(!!storedUserId);
-      setUserId(storedUserId);
-      console.log('Auth status updated. isAuthenticated:', !!storedUserId);
+      const storedTeamId = await AsyncStorage.getItem('teamId');
+      console.log('Stored userId:', storedUserId, 'Stored teamId:', storedTeamId);
+      
+      if (storedUserId && storedTeamId) {
+        // Verify Firebase token
+        const user = auth.currentUser;
+        if (user) {
+          await user.getIdToken(true); // Force token refresh
+          setIsAuthenticated(true);
+          setUserId(storedUserId);
+          setTeamId(storedTeamId);
+        } else {
+          // Token invalid, force re-authentication
+          throw new Error('Firebase token invalid');
+        }
+      } else {
+        throw new Error('Incomplete auth data');
+      }
+      
+      console.log('Auth status updated. isAuthenticated:', true);
     } catch (error) {
       console.error('Error checking auth status:', error);
       setIsAuthenticated(false);
       setUserId(null);
+      setTeamId(null);
+      await AsyncStorage.multiRemove(['userId', 'teamId']);
     }
   }, []);
 
@@ -60,12 +81,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
    * 
    * @param newUserId - The ID of the user to sign in
    */
-  const signIn = useCallback(async (newUserId: string) => {
-    console.log('Signing in with userId:', newUserId);
+  const signIn = useCallback(async (newUserId: string, newTeamId: string) => {
+    console.log('Signing in with userId:', newUserId, 'teamId:', newTeamId);
     try {
       await AsyncStorage.setItem('userId', newUserId);
+      await AsyncStorage.setItem('teamId', newTeamId);
       setIsAuthenticated(true);
       setUserId(newUserId);
+      setTeamId(newTeamId);
       console.log('Sign in successful');
     } catch (error) {
       console.error('Error signing in:', error);
@@ -78,9 +101,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = useCallback(async () => {
     console.log('Signing out...');
     try {
-      await AsyncStorage.removeItem('userId');
+      await AsyncStorage.multiRemove(['userId', 'teamId']);
+      await auth.signOut(); // Sign out from Firebase
       setIsAuthenticated(false);
       setUserId(null);
+      setTeamId(null);
       console.log('Sign out successful');
     } catch (error) {
       console.error('Error signing out:', error);
@@ -91,7 +116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AuthContext.Provider 
-      value={{ isAuthenticated, userId, signIn, signOut, checkAuthStatus }}
+      value={{ isAuthenticated, userId, teamId, signIn, signOut, checkAuthStatus }}
     >
       {children}
     </AuthContext.Provider>
