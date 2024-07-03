@@ -14,7 +14,6 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [teamId, setTeamId] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const { signIn, isAuthenticated } = useAuth();
 
@@ -37,7 +36,6 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
       console.log('Authentication Successful', `UserId: ${userId}`);
     } catch (error) {
       console.error('Authentication error:', error);
-      setError('Authentication failed. Please try again.');
       Alert.alert('Authentication Error', 'Authentication failed. Please try again.');
     }
   };

@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackgroundGeolocation from 'react-native-background-geolocation';
 import { updateLocation } from '../services/location';
 import Map from '../components/Map';
 import { Location } from '../types';
-import { signOut } from '../services/auth';
+import { signOut as apiSignOut } from '../services/auth';
+import { useAuth } from '../hooks/useAuth';
 
 
 const MainScreen = () => {
     const [userId, setUserId] = useState<string | null>(null);
     const [teamId, setTeamId] = useState<string | null>(null);
+    const { signOut, isAuthenticated } = useAuth();
 
     console.log('Main component rendering, userID:', userId, ', teamId: ', teamId);
 
@@ -51,13 +53,17 @@ const MainScreen = () => {
     }, [userId, teamId]);
 
     const handleSignOut = async () => {
-        try {
+        try{ 
+            await apiSignOut();
+            console.log('Sign out successful');
+            
+            // Use the signOut function from useAuth hook
             await signOut();
-            // Navigation will be handled automatically by AppNavigator
-            // based on the authentication state
+            console.log('Authentication state updated');
+            console.log('Authentication Logout Successful');
         } catch (error) {
-            console.error('Error signing out:', error);
-            // Optionally, show an error message to the user
+            console.error('Logout error:', error);
+            Alert.alert('Authentication Error', 'Sign Out failed. Please try again.');
         }
     };
         

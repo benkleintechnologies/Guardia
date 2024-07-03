@@ -116,7 +116,7 @@ We're now using Firebase as the backend (for authentication and storing data in 
 
    or to debug, go to the run and debug tab in VSCode and select the "Debug Mobile (Expo)" configuration.
 
-   Only got iOS to run successfully using `npx react-native run-ios` 
+   Only got iOS to run successfully using `npx react-native run-ios`
 
 2. Access the mobile app using the Expo Go app on your mobile device by scanning the QR Code (or in a simulator on your device, using one of the other options).
 
