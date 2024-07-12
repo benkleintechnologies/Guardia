@@ -12,10 +12,15 @@ import { db } from '../firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { Location } from '../types';
 import { FontAwesome } from '@expo/vector-icons';
+import CustomMarker from './CustomMarker';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 interface MapProps extends MapViewProps {
   mapRef: React.RefObject<MapView>;
   onCenterPress: () => void;
+  onRefocusPress: () => void; // New prop for refocus button
+  setLocations: (locations: Location[]) => void; // New prop to set locations in parent component
 }
 
 /**
@@ -27,8 +32,8 @@ interface MapProps extends MapViewProps {
  * @param mapRef - Ref to the MapView component
  * @param onCenterPress - Callback function to center the map on the user's location
  */
-const Map = ({ mapRef, onCenterPress }: MapProps) => {
-  const [locations, setLocations] = useState<Location[]>([]);
+const Map = ({ mapRef, onCenterPress, onRefocusPress, setLocations }: MapProps) => {
+  const [locations, setLocalLocations] = useState<Location[]>([]);
 
   useEffect(() => {
     // Set up real-time listener for location updates from Firebase
@@ -37,6 +42,7 @@ const Map = ({ mapRef, onCenterPress }: MapProps) => {
         id: doc.id,
         ...(doc.data() as Location)
       })) as Location[];
+      setLocalLocations(locationsData);
       setLocations(locationsData);
 
       // Fit map to show all markers
@@ -68,12 +74,18 @@ const Map = ({ mapRef, onCenterPress }: MapProps) => {
             coordinate={{ latitude: location.latitude, longitude: location.longitude }}
             title={`User: ${location.userId}`}
             description={`Team: ${location.teamId}`}
-          />
+          >
+            <CustomMarker />
+            {/*<FontAwesome name="map-marker" size={24} color="#ff0000" />*/}
+          </Marker>
         ))}
       </MapView>
       {/* Button to center the map on the user's location */}
       <TouchableOpacity style={styles.centerButton} onPress={onCenterPress}>
-        <FontAwesome name="location-arrow" size={24} color="black" />
+        <MaterialIcons name="my-location" size={24} color="black" />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.refocusButton} onPress={onRefocusPress}>
+        <MaterialCommunityIcons name="fullscreen" size={24} color="black" />
       </TouchableOpacity>
     </View>
   );
@@ -93,7 +105,20 @@ const styles = StyleSheet.create({
   },
   centerButton: {
     position: 'absolute',
-    bottom: 130,
+    bottom: 100,
+    right: 20,
+    backgroundColor: 'white',
+    borderRadius: 50,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 4,
+  },
+  refocusButton: {
+    position: 'absolute',
+    bottom: 160,
     right: 20,
     backgroundColor: 'white',
     borderRadius: 50,

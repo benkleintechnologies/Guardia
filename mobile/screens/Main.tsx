@@ -28,6 +28,7 @@ import MapView from 'react-native-maps';
 const MainScreen = () => {
     const [userId, setUserId] = useState<string | null>(null);
     const [teamId, setTeamId] = useState<string | null>(null);
+    const [locations, setLocations] = useState<Location[]>([]);
     const { signOut } = useAuth();
     const mapRef = useRef<MapView>(null);
     
@@ -118,13 +119,26 @@ const MainScreen = () => {
             }, 1000);
         }
     };
+    
+    const refocusOnAllLocations = () => {
+        console.log("refocusOnAllLocations called");
+        if (mapRef.current && locations.length > 0) {
+            const coordinates = locations.map(loc => ({
+                latitude: loc.latitude,
+                longitude: loc.longitude
+            }));
+            mapRef.current.fitToCoordinates(coordinates, {
+                edgePadding: { top: 100, right: 50, bottom: 100, left: 50 },
+                animated: true,
+            });
+        }
+    };
         
     return (
         <View style={styles.container}>
-            <Map mapRef={mapRef} onCenterPress={centerOnUser} />
+            <Map mapRef={mapRef} onCenterPress={centerOnUser} onRefocusPress={refocusOnAllLocations} setLocations={setLocations} />
             <View style={styles.overlay}>
-                <Text style={styles.info}>Main screen with map and other information</Text>
-                <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+                 <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
                     <Text style={styles.signOutButtonText}>Sign Out</Text>
                 </TouchableOpacity>
             </View>

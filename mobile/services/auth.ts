@@ -24,11 +24,14 @@ export const signIn = async (email: string, password: string): Promise<[string, 
     const user = userCredential.user;
     let teamId = ""
 
+    // Obtain the login token
+    const token = await user.getIdToken();
+    // Save the token locally for persistent login
+    await AsyncStorage.setItem('loginToken', token);  // Store loginToken locally
+
     // Fetch user profile from Firestore
     // Create a query against the 'users' collection where 'userId' field matches 'user.uid'
     const usersQuery = query(collection(db, 'users'), where('userId', '==', user.uid));
-
-    // Execute the query
     const querySnapshot = await getDocs(usersQuery);
 
     // querySnapshot.docs will contain the list of documents that match the query
@@ -65,6 +68,11 @@ export const signUp = async (email: string, password: string, teamId: string): P
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
+    // Obtain the login token
+    const token = await user.getIdToken();
+    // Save the token locally for persistent login
+    await AsyncStorage.setItem('loginToken', token);  // Store loginToken locally
+
     // Add user to Firestore with teamId
     await setDoc(doc(db, 'users', user.uid), {
       userId: user.uid,
@@ -90,6 +98,7 @@ export const signUp = async (email: string, password: string, teamId: string): P
 export const signOut = async (): Promise<void> => {
   await AsyncStorage.removeItem('userId');
   await AsyncStorage.removeItem('teamId');
+  await AsyncStorage.removeItem('loginToken');
   await auth.signOut();
 };
 
@@ -99,6 +108,31 @@ export const signOut = async (): Promise<void> => {
  * @returns Promise resolving to a boolean indicating if the user is authenticated
  */
 export const checkAuthStatus = async (): Promise<boolean> => {
-  const userId = await AsyncStorage.getItem('userId');
-  return !!userId;
+  const currentUser = auth.currentUser;
+  if (currentUser) {
+    try {
+      // This will automatically refresh the token if it's expired
+      const idToken = await currentUser.getIdToken(true);
+      await AsyncStorage.setItem('loginToken', idToken);
+      return true;
+    } catch (error) {
+      console.error('Error refreshing token:', error);
+      return false;
+    }
+  }
+  return false;
+};
+
+export const getIdToken = async (): Promise<string | null> => {
+  const currentUser = auth.currentUser;
+  if (currentUser) {
+    try {
+      // This will automatically refresh the token if it's expired
+      return await currentUser.getIdToken(true);
+    } catch (error) {
+      console.error('Error getting ID token:', error);
+      return null;
+    }
+  }
+  return null;
 };

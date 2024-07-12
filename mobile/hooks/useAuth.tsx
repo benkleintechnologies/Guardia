@@ -8,6 +8,7 @@
 import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../firebase'; // Import Firebase auth
+import { checkAuthStatus, signOut as authSignOut, getIdToken } from '../services/auth';
 
 /**
  * Type definition for the authentication context
@@ -18,7 +19,7 @@ type AuthContextType = {
   teamId: string | null;
   signIn: (newUserId: string, newTeamId: string) => Promise<void>;
   signOut: () => Promise<void>;
-  checkAuthStatus: () => Promise<void>;
+  getIdToken: () => Promise<string | null>;
 };
 
 // Create the authentication context
@@ -37,44 +38,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   /**
    * Checks the current authentication status
    */
-  const checkAuthStatus = useCallback(async () => {
+  const checkAuth = useCallback(async () => {
     console.log('Checking auth status...');
     try {
-      const storedUserId = await AsyncStorage.getItem('userId');
-      const storedTeamId = await AsyncStorage.getItem('teamId');
-      console.log('Stored userId:', storedUserId, 'Stored teamId:', storedTeamId);
-      
-      if (storedUserId && storedTeamId) {
-        // Verify Firebase token
-        const user = auth.currentUser;
-        if (user) {
-          await user.getIdToken(true); // Force token refresh
-          setIsAuthenticated(true);
-          setUserId(storedUserId);
-          setTeamId(storedTeamId);
-        } else {
-          // Token invalid, force re-authentication
-          throw new Error('Firebase token invalid');
-        }
+      const authStatus = await checkAuthStatus();
+      setIsAuthenticated(authStatus);
+      if (authStatus) {
+        const storedUserId = await AsyncStorage.getItem('userId');
+        const storedTeamId = await AsyncStorage.getItem('teamId');
+        setUserId(storedUserId);
+        setTeamId(storedTeamId);
       } else {
-        throw new Error('Incomplete auth data');
+        setUserId(null);
+        setTeamId(null);
       }
-      
-      console.log('Auth status updated. isAuthenticated:', true);
+      console.log('Auth status updated. isAuthenticated:', authStatus);
     } catch (error) {
       console.error('Error checking auth status:', error);
       setIsAuthenticated(false);
       setUserId(null);
       setTeamId(null);
-      await AsyncStorage.multiRemove(['userId', 'teamId']);
     }
   }, []);
 
   // Check authentication status on component mount
   useEffect(() => {
     console.log('AuthProvider mounted. Checking initial auth status...');
-    checkAuthStatus();
-  }, [checkAuthStatus]);
+    checkAuth();
+  }, [checkAuth]);
 
   /**
    * Signs in a user
@@ -101,8 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = useCallback(async () => {
     console.log('Signing out...');
     try {
-      await AsyncStorage.multiRemove(['userId', 'teamId']);
-      await auth.signOut(); // Sign out from Firebase
+      await authSignOut();
       setIsAuthenticated(false);
       setUserId(null);
       setTeamId(null);
@@ -116,7 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AuthContext.Provider 
-      value={{ isAuthenticated, userId, teamId, signIn, signOut, checkAuthStatus }}
+      value={{ isAuthenticated, userId, teamId, signIn, signOut, getIdToken }}
     >
       {children}
     </AuthContext.Provider>
