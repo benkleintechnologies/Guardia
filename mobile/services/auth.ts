@@ -8,7 +8,7 @@
 
 import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDocs, setDoc, query, where, collection } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /**
@@ -25,13 +25,24 @@ export const signIn = async (email: string, password: string): Promise<[string, 
     let teamId = ""
 
     // Fetch user profile from Firestore
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    console.log(userDoc);
-    if (userDoc.exists()) {
+    // Create a query against the 'users' collection where 'userId' field matches 'user.uid'
+    const usersQuery = query(collection(db, 'users'), where('userId', '==', user.uid));
+
+    // Execute the query
+    const querySnapshot = await getDocs(usersQuery);
+
+    // querySnapshot.docs will contain the list of documents that match the query
+    // If you are expecting a single document, you can access it with querySnapshot.docs[0] if it exists
+    if (!querySnapshot.empty) {
+      // Assuming a single user document per userID, so we take the first
+      const userDoc = querySnapshot.docs[0];
       const userData = userDoc.data();
+      console.log('userDoc data: ', userData);
       await AsyncStorage.setItem('userId', user.uid);  // Store userId locally
       await AsyncStorage.setItem('teamId', userData.teamId);  // Store teamId locally
       teamId = userData.teamId;
+    } else {
+      console.log('No user document found');
     }
 
     return [user.uid, teamId];
@@ -57,7 +68,7 @@ export const signUp = async (email: string, password: string, teamId: string): P
     // Add user to Firestore with teamId
     await setDoc(doc(db, 'users', user.uid), {
       userId: user.uid,
-      teamId,
+      teamId: teamId,
       canViewOthers: false, // Default permission
       role: 'volunteer' // Default role
     });

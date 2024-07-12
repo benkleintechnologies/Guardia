@@ -49,21 +49,27 @@ const MainScreen = () => {
             console.log('Permissions status:', status);
         });
 
+        // Handle location updates
+        BackgroundGeolocation.onLocation(
+            (location) => {
+                console.log('[location] -', location);
+                if (userId && teamId) {
+                    updateLocation(userId, teamId, location.coords.latitude, location.coords.longitude);
+                }
+            },
+            (error) => {
+                console.error('[location] ERROR -', error);
+            }
+        );
+
         BackgroundGeolocation.ready({
             desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
-            distanceFilter: 10,
+            distanceFilter: 5,
             stopOnTerminate: false,
             startOnBoot: true,
         }, (state) => {
             if (!state.enabled) {
                 BackgroundGeolocation.start();
-            }
-        });
-
-        // Handle location updates
-        BackgroundGeolocation.on('location', (location: Location) => {
-            if (userId && teamId) {
-                updateLocation(userId, teamId, location.latitude, location.longitude);
             }
         });
 

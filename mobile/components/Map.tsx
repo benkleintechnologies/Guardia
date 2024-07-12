@@ -46,7 +46,7 @@ const Map = ({ mapRef, onCenterPress }: MapProps) => {
           longitude: loc.longitude
         }));
         mapRef.current?.fitToCoordinates(coordinates, {
-          edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+          edgePadding: { top: 100, right: 50, bottom: 100, left: 50 },
           animated: true,
         });
       }

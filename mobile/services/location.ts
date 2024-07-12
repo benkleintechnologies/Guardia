@@ -43,6 +43,7 @@ export const updateLocation = async (userId: string, teamId: string, latitude: n
             longitude,
             timestamp: serverTimestamp(),
         });
+        console.log("Location updated successfully!");
     } catch (error) {
         console.error('Error updating location:', error);
     }
