@@ -48,6 +48,13 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
       <Text variant="titleLarge" style={styles.title}>
         {isSignUp ? 'Sign Up' : 'Sign In'}
       </Text>
+            <TextInput
+        label="Name"
+        value={name}
+        onChangeText={setName}
+        mode="outlined"
+        style={styles.input}
+      />
       <TextInput
         label="Email"
         value={email}
