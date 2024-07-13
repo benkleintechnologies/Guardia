@@ -9,12 +9,13 @@ export const signIn = async (email: string, password: string): Promise<string> =
     const user = userCredential.user;
 
     // Fetch user profile from Firestore
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    console.log(userDoc);
-    if (userDoc.exists()) {
-      const userData = userDoc.data();
-      await AsyncStorage.setItem('userId', user.uid);  // Store userId locally
-      await AsyncStorage.setItem('teamId', userData.teamId);  // Store teamId locally
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      await AsyncStorage.setItem('userId', user.uid);
+      await AsyncStorage.setItem('teamId', userData.teamId);
     }
 
     return user.uid;
@@ -33,13 +34,14 @@ export const signUp = async (email: string, password: string, teamId: string): P
     await setDoc(doc(db, 'users', user.uid), {
       userId: user.uid,
       teamId,
-      canViewOthers: false, // Default permission
-      role: 'volunteer' // Default role
+      name,
+      canViewOthers: false,
+      role: 'volunteer'
     });
 
     // Store locally
-    await AsyncStorage.setItem('userId', user.uid);  // Store userId
-    await AsyncStorage.setItem('teamId', teamId);  // Store teamId
+    await AsyncStorage.setItem('userId', user.uid);
+    await AsyncStorage.setItem('teamId', teamId);
 
     return user.uid;
   } catch (error) {
