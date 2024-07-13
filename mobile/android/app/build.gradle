@@ -1,6 +1,7 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
+apply plugin: 'com.google.gms.google-services'
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
@@ -79,7 +80,7 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
 // @generated begin react-native-background-geolocation-project - expo prebuild (DO NOT MODIFY) sync-451bbca0f2f08c9fc8b21a201ef5b476b165ba21
-Project background_geolocation = project(':react-native-background-geolocation')
+def background_geolocation = project(':react-native-background-geolocation')
 apply from: "${background_geolocation.projectDir}/app.gradle"
 // @generated end react-native-background-geolocation-project
     ndkVersion rootProject.ext.ndkVersion
@@ -146,9 +147,23 @@ apply from: "${background_geolocation.projectDir}/app.gradle"
     }
 }
 
+repositories {
+    google()
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
+    implementation platform('com.google.firebase:firebase-bom:26.0.0')
+    implementation('com.google.firebase:firebase-analytics')
     implementation("com.facebook.react:react-android")
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation(name: 'tsbackgroundfetch-1.0.2', ext: 'aar')
+
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";

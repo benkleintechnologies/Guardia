@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "444961312315",
+    "project_id": "emergency-response-track-a7751",
+    "storage_bucket": "emergency-response-track-a7751.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444961312315:android:cf3a73fc29de29e66b961e",
+        "android_client_info": {
+          "package_name": "com.cachemoney613.EmergencyTeamTracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALNZOiiYY2WkFwKtUg0wMLo5EhuGDtg40"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
