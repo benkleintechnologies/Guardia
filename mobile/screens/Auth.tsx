@@ -12,6 +12,7 @@ type AuthScreenProps = {
 const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [teamId, setTeamId] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,14 +22,14 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
   console.log('Auth component rendering, isAuthenticated:', isAuthenticated);
 
   const handleAuth = async () => {
-    try{ 
-      let userId: string = "";
+    try{
+      let userId: string = "''";
       if (isSignUp) {
-          userId = await apiSignUp(email, password, teamId);
-          console.log('Sign up successful, userId:', userId);
+        userId = await apiSignUp(name, email, password, teamId);
+        console.log('Sign up successful, userId:', userId);
       } else {
-          userId = await apiSignIn(email, password);
-          console.log('Sign in successful, userId:', userId);
+        userId = await apiSignIn(email, password);
+        console.log('Sign in successful, userId:', userId);
       }
 
       // Use the signIn function from useAuth hook
@@ -38,7 +39,7 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
     } catch (error) {
       console.error('Authentication error:', error);
       setError('Authentication failed. Please try again.');
-      Alert.alert('Authentication Error', 'Authentication failed. Please try again.');
+      console.log('Authentication Error', 'Authentication failed. Please try again.');
     }
   };
 
@@ -47,6 +48,15 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
       <Text variant="titleLarge" style={styles.title}>
         {isSignUp ? 'Sign Up' : 'Sign In'}
       </Text>
+      {isSignUp && (
+        <TextInput
+        label="Name"
+        value={name}
+        onChangeText={setName}
+        mode="outlined"
+        style={styles.input}
+      />
+      )}
       <TextInput
         label="Email"
         value={email}

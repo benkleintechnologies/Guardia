@@ -24,7 +24,7 @@ export const signIn = async (email: string, password: string): Promise<string> =
   }
 };
 
-export const signUp = async (email: string, password: string, teamId: string): Promise<string> => {
+export const signUp = async (name: string, email: string, password: string, teamId: string): Promise<string> => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -33,8 +33,9 @@ export const signUp = async (email: string, password: string, teamId: string): P
     await setDoc(doc(db, 'users', user.uid), {
       userId: user.uid,
       teamId,
-      canViewOthers: false, // Default permission
-      role: 'volunteer' // Default role
+      name,
+      canViewOthers: false,
+      role: 'volunteer'
     });
 
     // Store locally
