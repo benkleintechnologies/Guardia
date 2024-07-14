@@ -35,11 +35,9 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
       // Use the signIn function from useAuth hook
       await signIn(userId);
       console.log('Authentication state updated');
-      Alert.alert('Authentication Successful', `UserId: ${userId}`);
     } catch (error) {
       console.error('Authentication error:', error);
       setError('Authentication failed. Please try again.');
-      Alert.alert('Authentication Error', 'Authentication failed. Please try again.');
     }
   };
 
@@ -117,3 +115,4 @@ const styles = StyleSheet.create({
 });
 
 export default Auth;
+
