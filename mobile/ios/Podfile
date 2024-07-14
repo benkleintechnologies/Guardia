@@ -12,12 +12,17 @@ install! 'cocoapods', :deterministic_uuids => false
 
 prepare_react_native_project!
 
+use_modular_headers!
+
 target 'TrackerApp' do
   use_expo_modules!
   config = use_native_modules!
 
   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
   use_frameworks! :linkage => ENV['USE_FRAMEWORKS'].to_sym if ENV['USE_FRAMEWORKS']
+
+  # Ensure React dependencies are included
+  pod 'React-RCTAppDelegate', :path => '../node_modules/react-native/Libraries/AppDelegate'
 
   # Flags change depending on the env values.
   flags = get_default_flags()
@@ -54,5 +59,10 @@ target 'TrackerApp' do
     rescue => e
       Pod::UI.warn e
     end
+
+    # Comment out or remove the following line
+    # __apply_Xcode_12_5_M1_post_install_workaround(installer)
+    
+    File.delete('./.xcode.env.local') if File.exist?('./.xcode.env.local')
   end
 end

@@ -12,14 +12,7 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "types": [
-      "node",
-      "react",
-      "react-native",
-      "jest",
-      "expo",
-      "react-native-background-geolocation"
-    ]
+    "types": ["node", "react", "react-native", "jest", "expo"]
   },
   "include": [
     "**/*.ts",

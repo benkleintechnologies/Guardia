@@ -8,14 +8,17 @@
 import React, { useEffect, useState , useRef} from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import BackgroundGeolocation from 'react-native-background-geolocation';
-import { updateLocation } from '../services/location';
 import Map from '../components/Map';
-import { Location } from '../types';
+import { Location as LocationType } from '../types';
 import { signOut as apiSignOut } from '../services/auth';
 import { useAuth } from '../hooks/useAuth';
-import * as ExpoLocation from 'expo-location';
+import * as Location from 'expo-location';
+import { startLocationTracking, stopLocationTracking } from '../services/locationTask';
 import MapView from 'react-native-maps';
+
+interface TaskData {
+    locations: LocationType[];
+}
 
 /**
  * MainScreen Component
@@ -28,7 +31,7 @@ import MapView from 'react-native-maps';
 const MainScreen = () => {
     const [userId, setUserId] = useState<string | null>(null);
     const [teamId, setTeamId] = useState<string | null>(null);
-    const [locations, setLocations] = useState<Location[]>([]);
+    const [locations, setLocations] = useState<LocationType[]>([]);
     const { signOut } = useAuth();
     const mapRef = useRef<MapView>(null);
     
@@ -45,37 +48,26 @@ const MainScreen = () => {
 
         fetchUserData();
 
-        // Set up background geolocation
-        BackgroundGeolocation.requestPermission().then((status) => {
-            console.log('Permissions status:', status);
-        });
-
-        // Handle location updates
-        BackgroundGeolocation.onLocation(
-            (location) => {
-                console.log('[location] -', location);
-                if (userId && teamId) {
-                    updateLocation(userId, teamId, location.coords.latitude, location.coords.longitude);
-                }
-            },
-            (error) => {
-                console.error('[location] ERROR -', error);
+        const setupLocationTracking = async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                console.log('Permission to access location was denied');
+                return;
             }
-        );
 
-        BackgroundGeolocation.ready({
-            desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
-            distanceFilter: 5,
-            stopOnTerminate: false,
-            startOnBoot: true,
-        }, (state) => {
-            if (!state.enabled) {
-                BackgroundGeolocation.start();
+            let backgroundStatus = await Location.requestBackgroundPermissionsAsync();
+            if (backgroundStatus.status !== 'granted') {
+                console.log('Permission to access location in background was denied');
+                // You might want to continue with foreground-only tracking or inform the user
             }
-        });
+
+            await startLocationTracking();
+        };
+
+        setupLocationTracking();
 
         return () => {
-            BackgroundGeolocation.removeAllListeners();
+            stopLocationTracking();
         };
     }, [userId, teamId]);
 
@@ -102,13 +94,13 @@ const MainScreen = () => {
      */
     const centerOnUser = async () => {
         console.log("centerOnUser called");
-        let { status } = await ExpoLocation.requestForegroundPermissionsAsync();
+        let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
             Alert.alert('Permission to access location was denied');
             return;
         }
         console.log("mapRef: ", mapRef);
-        let location = await ExpoLocation.getCurrentPositionAsync({});
+        let location = await Location.getCurrentPositionAsync({});
         if (mapRef.current) {
             console.log("center on user location: long-" + location.coords.longitude + ", lat-" + location.coords.latitude);
             mapRef.current.animateToRegion({
