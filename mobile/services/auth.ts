@@ -58,12 +58,13 @@ export const signIn = async (email: string, password: string): Promise<[string, 
 /**
  * Signs up a new user with email, password, and team ID
  * 
+ * @param name - User's name
  * @param email - User's email
  * @param password - User's password
  * @param teamId - User's team ID
- * @returns Promise resolving to the new user's ID
+ * @returns Promise resolving to the new user's ID and teamId
  */
-export const signUp = async (email: string, password: string, teamId: string): Promise<[string, string]> => {
+export const signUp = async (name: string, email: string, password: string, teamId: string): Promise<[string, string]> => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -77,13 +78,14 @@ export const signUp = async (email: string, password: string, teamId: string): P
     await setDoc(doc(db, 'users', user.uid), {
       userId: user.uid,
       teamId: teamId,
+      name: name,
       canViewOthers: false, // Default permission
       role: 'volunteer' // Default role
     });
 
     // Store locally
-    await AsyncStorage.setItem('userId', user.uid);  // Store userId
-    await AsyncStorage.setItem('teamId', teamId);  // Store teamId
+    await AsyncStorage.setItem('userId', user.uid);
+    await AsyncStorage.setItem('teamId', teamId);
 
     return [user.uid, teamId];
   } catch (error) {

@@ -28,8 +28,10 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
   // State variables for form inputs and mode
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [teamId, setTeamId] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Custom hook for authentication
   const { signIn, isAuthenticated } = useAuth();
@@ -42,24 +44,24 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
   const handleAuth = async () => {
     try{ 
       let userId: string = "";
-      let teamId: string = "";
+      let team: string = "";
       if (isSignUp) {
-          // Call sign up API
-          [userId, teamId] = await apiSignUp(email, password, teamId);
-          console.log('Sign up successful, userId:', userId, ', teamId: ', teamId);
+        // Call sign up API
+        [userId, team] = await apiSignUp(name, email, password, teamId);
+        console.log('Sign up successful, userId:', userId, ', teamId: ', team);
       } else {
-          // Call sign in API
-          [userId, teamId] = await apiSignIn(email, password);
-          console.log('Sign in successful, userId:', userId, ', teamId: ', teamId);
+        // Call sign in API
+        [userId, team] = await apiSignIn(email, password);
+        console.log('Sign in successful, userId:', userId, ', teamId: ', team);
       }
 
       // Update authentication state
-      await signIn(userId, teamId);
+      await signIn(userId, team);
       console.log('Authentication state updated');
-      console.log('Authentication Successful', `UserId: ${userId}, TeamId: ${teamId}`);
+      console.log('Authentication Successful', `UserId: ${userId}, TeamId: ${team}`);
     } catch (error) {
       console.error('Authentication error:', error);
-      Alert.alert('Authentication Error', 'Authentication failed. Please try again.');
+      setError('Authentication failed. Please try again.');
     }
   };
 
@@ -69,6 +71,15 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
         {isSignUp ? 'Sign Up' : 'Sign In'}
       </Text>
       {/* Form inputs */}
+      {isSignUp && (
+        <TextInput
+          label="Name"
+          value={name}
+          onChangeText={setName}
+          mode="outlined"
+          style={styles.input}
+        />
+      )}
       <TextInput
         label="Email"
         value={email}
@@ -132,3 +143,4 @@ const styles = StyleSheet.create({
 });
 
 export default Auth;
+

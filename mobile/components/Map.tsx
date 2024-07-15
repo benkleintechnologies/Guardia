@@ -9,7 +9,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import MapView, { Marker, MapViewProps } from 'react-native-maps';
 import { db } from '../firebase';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, doc, getDoc } from 'firebase/firestore';
 import { Location } from '../types';
 import { FontAwesome } from '@expo/vector-icons';
 import CustomMarker from './CustomMarker';
@@ -34,6 +34,7 @@ interface MapProps extends MapViewProps {
  */
 const Map = ({ mapRef, onCenterPress, onRefocusPress, setLocations }: MapProps) => {
   const [locations, setLocalLocations] = useState<Location[]>([]);
+  const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     // Set up real-time listener for location updates from Firebase
@@ -64,6 +65,26 @@ const Map = ({ mapRef, onCenterPress, onRefocusPress, setLocations }: MapProps) 
     return () => unsubscribe();
   }, [mapRef]);
 
+  useEffect(() => {
+    const fetchUserNames = async () => {
+      const userIds = locations.map(location => location.userId);
+      const names: { [key: string]: string } = {};
+      
+      for (const userId of userIds) {
+        const userDoc = await getDoc(doc(db, 'users', userId));
+        if (userDoc.exists()) {
+          names[userId] = userDoc.data().name || 'Unknown';
+        }
+      }
+      
+      setUserNames(names);
+    };
+
+    if (locations.length > 0) {
+      fetchUserNames();
+    }
+  }, [locations]);
+
   return (
     <View style={styles.container}>
       <MapView ref={mapRef} style={styles.map}>
@@ -72,7 +93,7 @@ const Map = ({ mapRef, onCenterPress, onRefocusPress, setLocations }: MapProps) 
           <Marker
             key={location.userId}
             coordinate={{ latitude: location.latitude, longitude: location.longitude }}
-            title={`User: ${location.userId}`}
+            title={`User: ${userNames[location.userId] || 'Loading...'}`}
             description={`Team: ${location.teamId}`}
           >
             <CustomMarker />
