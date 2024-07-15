@@ -6,15 +6,17 @@
  */
 
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Alert, Button } from 'react-native';
 import MapView, { Marker, MapViewProps } from 'react-native-maps';
-import { db } from '../firebase';
-import { collection, onSnapshot, doc, getDoc } from 'firebase/firestore';
+import { db, serverTimestamp } from '../firebase';
+import { collection, onSnapshot, doc, getDoc, setDoc } from 'firebase/firestore';
 import { Location } from '../types';
 import { FontAwesome } from '@expo/vector-icons';
 import CustomMarker from './CustomMarker';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ExpoLocation from 'expo-location';
 
 interface MapProps extends MapViewProps {
   mapRef: React.RefObject<MapView>;

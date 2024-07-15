@@ -16,6 +16,8 @@ import { signOut as apiSignOut } from '../services/auth';
 import { useAuth } from '../hooks/useAuth';
 import * as ExpoLocation from 'expo-location';
 import MapView from 'react-native-maps';
+import { collection, doc, setDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { db, serverTimestamp } from '../firebase';
 
 /**
  * MainScreen Component
@@ -153,14 +155,57 @@ const MainScreen = () => {
             });
         }
     };
+
+    const sendSOS = async () => {
+        try {
+            const sosDocRef = doc(collection(db, 'sos'));
+            let location = await ExpoLocation.getCurrentPositionAsync({});
+            const userId = await AsyncStorage.getItem('userId');
+            const teamId = await AsyncStorage.getItem('teamId');
+
+            await setDoc(sosDocRef, {
+            userId,
+            teamId,
+            timestamp: serverTimestamp(),
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            });
+
+            Alert.alert('SOS sent', 'Your SOS signal has been sent to all users.');
+        } catch (error) {
+            console.error('Error sending SOS:', error);
+        }
+    };
+
+    // Receive SOS Alerts and display as a notification
+    useEffect(() => {
+        const sosQuery = query(collection(db, 'sos'), orderBy('timestamp', 'desc'), limit(1));
+        const unsubscribe = onSnapshot(sosQuery, snapshot => {
+            snapshot.docChanges().forEach(change => {
+            if (change.type === 'added') {
+                const sosData = change.doc.data();
+                // TODO: Display a notification
+                // And maybe change the color of the marker or something
+            }
+            });
+        });
+
+        return () => unsubscribe();
+    }, []);
+
         
     return (
         <View style={styles.container}>
             <Map mapRef={mapRef} onCenterPress={centerOnUser} onRefocusPress={refocusOnAllLocations} setLocations={setLocations} />
             <View style={styles.overlay}>
-                 <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-                    <Text style={styles.signOutButtonText}>Sign Out</Text>
-                </TouchableOpacity>
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+                        <Text style={styles.buttonText}>Sign Out</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.sosButtonContainer} onPress={sendSOS}>
+                        <Text style={styles.buttonText}>SOS</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );
@@ -183,15 +228,29 @@ const styles = StyleSheet.create({
     info: {
         marginBottom: 10,
     },
+    buttonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between', // Optional: to distribute buttons evenly
+    },
     signOutButton: {
+        flex: 1, // Make buttons equal width
+        backgroundColor: '#f39c12',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginHorizontal: 5,
+    },
+    sosButtonContainer: {
+        flex: 1, // Make buttons equal width
         backgroundColor: '#e74c3c',
         padding: 10,
         borderRadius: 5,
         alignItems: 'center',
-    },
-    signOutButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
+        marginHorizontal: 5,
     },
 });
 
