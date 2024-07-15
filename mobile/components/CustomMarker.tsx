@@ -2,7 +2,11 @@
 import React from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 
-const CustomMarker = () => {
+interface CustomMarkerProps {
+  color?: 'blue' | 'red';
+}
+
+const CustomMarker: React.FC<CustomMarkerProps> = ({ color = 'blue' }) => {
   const scale = new Animated.Value(1);
 
   Animated.loop(
@@ -22,8 +26,8 @@ const CustomMarker = () => {
 
   return (
     <View style={styles.marker}>
-      <Animated.View style={[styles.pulse, { transform: [{ scale }] }]} />
-      <View style={styles.dot} />
+      <Animated.View style={[color == 'blue' ? styles.bluePulse : styles.redPulse, { transform: [{ scale }] }]} />
+      <View style={color == 'blue' ? styles.blueDot : styles.redDot} />
     </View>
   );
 };
@@ -33,18 +37,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  pulse: {
+  bluePulse: {
     position: 'absolute',
     width: 20,
     height: 20,
     borderRadius: 10,
     backgroundColor: 'rgba(0, 150, 255, 0.3)',
   },
-  dot: {
+  redPulse: {
+    position: 'absolute',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 0, 0, 0.3)',
+  },
+  blueDot: {
     width: 15,
     height: 15,
     borderRadius: 10,
     backgroundColor: 'rgba(0, 150, 255, 1)',
+  },
+  redDot: {
+    width: 15,
+    height: 15,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 0, 0, 1)',
   },
 });
 
