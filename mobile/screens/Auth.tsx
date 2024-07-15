@@ -44,21 +44,21 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
   const handleAuth = async () => {
     try{ 
       let userId: string = "";
-      let teamId: string = "";
+      let team: string = "";
       if (isSignUp) {
         // Call sign up API
-        [userId, teamId] = await apiSignUp(name, email, password, teamId);
-        console.log('Sign up successful, userId:', userId, ', teamId: ', teamId);
+        [userId, team] = await apiSignUp(name, email, password, teamId);
+        console.log('Sign up successful, userId:', userId, ', teamId: ', team);
       } else {
         // Call sign in API
-        [userId, teamId] = await apiSignIn(email, password);
-        console.log('Sign in successful, userId:', userId, ', teamId: ', teamId);
+        [userId, team] = await apiSignIn(email, password);
+        console.log('Sign in successful, userId:', userId, ', teamId: ', team);
       }
 
       // Update authentication state
-      await signIn(userId, teamId);
+      await signIn(userId, team);
       console.log('Authentication state updated');
-      console.log('Authentication Successful', `UserId: ${userId}, TeamId: ${teamId}`);
+      console.log('Authentication Successful', `UserId: ${userId}, TeamId: ${team}`);
     } catch (error) {
       console.error('Authentication error:', error);
       setError('Authentication failed. Please try again.');
