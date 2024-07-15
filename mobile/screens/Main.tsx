@@ -16,7 +16,7 @@ import { signOut as apiSignOut } from '../services/auth';
 import { useAuth } from '../hooks/useAuth';
 import * as ExpoLocation from 'expo-location';
 import MapView from 'react-native-maps';
-import { collection, doc, setDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, doc, getDocs, setDoc, query, orderBy, limit, onSnapshot, where } from 'firebase/firestore';
 import { db, serverTimestamp } from '../firebase';
 
 /**
@@ -33,6 +33,7 @@ const MainScreen = () => {
     const [locations, setLocations] = useState<Location[]>([]);
     const { signOut } = useAuth();
     const mapRef = useRef<MapView>(null);
+    const isInitialRender = useRef(true);
     
     console.log('Main component rendering, userID:', userId, ', teamId: ', teamId);
 
@@ -164,14 +165,14 @@ const MainScreen = () => {
             const teamId = await AsyncStorage.getItem('teamId');
 
             await setDoc(sosDocRef, {
-            userId,
-            teamId,
-            timestamp: serverTimestamp(),
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
+                userId,
+                teamId,
+                timestamp: serverTimestamp(),
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
             });
 
-            Alert.alert('SOS sent', 'Your SOS signal has been sent to all users.');
+            console.log('SOS sent', 'Your SOS signal has been sent to all users.');
         } catch (error) {
             console.error('Error sending SOS:', error);
         }
@@ -181,11 +182,32 @@ const MainScreen = () => {
     useEffect(() => {
         const sosQuery = query(collection(db, 'sos'), orderBy('timestamp', 'desc'), limit(1));
         const unsubscribe = onSnapshot(sosQuery, snapshot => {
-            snapshot.docChanges().forEach(change => {
+            if (isInitialRender.current) {
+                isInitialRender.current = false;
+                return;
+            }
+
+            snapshot.docChanges().forEach(async change => {
             if (change.type === 'added') {
                 const sosData = change.doc.data();
-                // TODO: Display a notification
-                // And maybe change the color of the marker or something
+                // Alert when there's a new SOS. In the future make this a notification
+                // Get the name of the user who sent the SOS
+                const usersQuery = query(collection(db, 'users'), where('userId', '==', sosData.userId));
+                const querySnapshot = await getDocs(usersQuery);
+                let name = '';
+
+                if (!querySnapshot.empty) {
+                    // Assuming a single user document per userID, so we take the first
+                    const userDoc = querySnapshot.docs[0];
+                    const userData = userDoc.data();
+                    name = userData.name;
+                }
+
+                Alert.alert(
+                    "SOS Alert",
+                    `SOS from: ${name}`,
+                    [{ text: "Dismiss" }]
+                );
             }
             });
         });

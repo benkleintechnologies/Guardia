@@ -9,7 +9,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert, Button } from 'react-native';
 import MapView, { Marker, MapViewProps } from 'react-native-maps';
 import { db, serverTimestamp } from '../firebase';
-import { collection, onSnapshot, doc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, getDoc, setDoc, query, where, orderBy } from 'firebase/firestore';
 import { Location } from '../types';
 import { FontAwesome } from '@expo/vector-icons';
 import CustomMarker from './CustomMarker';
@@ -25,6 +25,14 @@ interface MapProps extends MapViewProps {
   setLocations: (locations: Location[]) => void; // New prop to set locations in parent component
 }
 
+interface SosData {
+  userId: string;
+  teamId: string;
+  timestamp: Date;
+  latitude: number;
+  longitude: number;
+}
+
 /**
  * Map Component
  * 
@@ -37,10 +45,11 @@ interface MapProps extends MapViewProps {
 const Map = ({ mapRef, onCenterPress, onRefocusPress, setLocations }: MapProps) => {
   const [locations, setLocalLocations] = useState<Location[]>([]);
   const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
+  const [sosUsers, setSosUsers] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Set up real-time listener for location updates from Firebase
-    const unsubscribe = onSnapshot(collection(db, 'locations'), (snapshot) => {
+    const unsubscribeLocations = onSnapshot(collection(db, 'locations'), (snapshot) => {
       const locationsData = snapshot.docs.map(doc => ({
         id: doc.id,
         ...(doc.data() as Location)
@@ -61,10 +70,30 @@ const Map = ({ mapRef, onCenterPress, onRefocusPress, setLocations }: MapProps) 
       }
     });
 
-    console.log("mapRef from inside Map.tsx", mapRef);
+    const unsubscribeSos = onSnapshot(
+      query(
+        collection(db, 'sos'),
+        where('timestamp', '>', new Date(Date.now() - 10 * 60 * 1000)), //Within last 10 minutes
+        orderBy('timestamp', 'desc')
+      ),
+      (snapshot) => {
+        const sosData = snapshot.docs.map(doc => ({
+          userId: doc.data().userId,
+          teamId: doc.data().teamId,
+          timestamp: doc.data().timestamp.toDate(),
+          latitude: doc.data().latitude,
+          longitude: doc.data().longitude,
+        })) as SosData[];
+        
+        const sosUserSet = new Set(sosData.map(sos => sos.userId));
+        setSosUsers(sosUserSet);
+      }
+    );
 
-    // Clean up the listener on component unmount
-    return () => unsubscribe();
+    return () => {
+      unsubscribeLocations();
+      unsubscribeSos();
+    };
   }, [mapRef]);
 
   useEffect(() => {
@@ -98,7 +127,7 @@ const Map = ({ mapRef, onCenterPress, onRefocusPress, setLocations }: MapProps) 
             title={`User: ${userNames[location.userId] || 'Loading...'}`}
             description={`Team: ${location.teamId}`}
           >
-            <CustomMarker />
+            <CustomMarker color={sosUsers.has(location.userId) ? 'red' : 'blue'} />
             {/*<FontAwesome name="map-marker" size={24} color="#ff0000" />*/}
           </Marker>
         ))}
