@@ -74,10 +74,30 @@ const MainScreen = () => {
             }
         });
 
+        // Update location when component mounts
+        updateCurrentLocation();
+
         return () => {
             BackgroundGeolocation.removeAllListeners();
         };
     }, [userId, teamId]);
+
+    /**
+     * Updates the current location when the component mounts
+     */
+    const updateCurrentLocation = async () => {
+        let { status } = await ExpoLocation.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('Permission to access location was denied');
+            return;
+        }
+
+        let location = await ExpoLocation.getCurrentPositionAsync({});
+        if (userId && teamId) {
+            updateLocation(userId, teamId, location.coords.latitude, location.coords.longitude);
+            console.log('Initial location updated:', location.coords);
+        }
+    };
 
     /**
      * Handles user sign out
