@@ -1,3 +1,10 @@
+/**
+ * Auth.tsx
+ * 
+ * This component handles user authentication (sign in and sign up) for the application.
+ * It uses React Native Paper for UI components and integrates with a custom authentication service.
+ */
+
 import React, { useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
@@ -9,7 +16,16 @@ type AuthScreenProps = {
   navigation: StackNavigationProp<any>;
 };
 
+/**
+ * Auth Component
+ * 
+ * This component renders a form for user authentication, allowing users to sign in or sign up.
+ * It switches between sign in and sign up modes based on user interaction.
+ * 
+ * @param navigation - Navigation prop from React Navigation
+ */
 const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
+  // State variables for form inputs and mode
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -17,24 +33,32 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Custom hook for authentication
   const { signIn, isAuthenticated } = useAuth();
 
   console.log('Auth component rendering, isAuthenticated:', isAuthenticated);
 
+  /**
+   * Handles the authentication process (sign in or sign up)
+   */
   const handleAuth = async () => {
-    try {
-      let userId: string = '';
+    try{ 
+      let userId: string = "";
+      let teamId: string = "";
       if (isSignUp) {
-        userId = await apiSignUp(name, email, password, teamId);
-        console.log('Sign up successful, userId:', userId);
+        // Call sign up API
+        [userId, teamId] = await apiSignUp(name, email, password, teamId);
+        console.log('Sign up successful, userId:', userId, ', teamId: ', teamId);
       } else {
-        userId = await apiSignIn(email, password);
-        console.log('Sign in successful, userId:', userId);
+        // Call sign in API
+        [userId, teamId] = await apiSignIn(email, password);
+        console.log('Sign in successful, userId:', userId, ', teamId: ', teamId);
       }
 
-      // Use the signIn function from useAuth hook
-      await signIn(userId);
+      // Update authentication state
+      await signIn(userId, teamId);
       console.log('Authentication state updated');
+      console.log('Authentication Successful', `UserId: ${userId}, TeamId: ${teamId}`);
     } catch (error) {
       console.error('Authentication error:', error);
       setError('Authentication failed. Please try again.');
@@ -46,14 +70,15 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
       <Text variant="titleLarge" style={styles.title}>
         {isSignUp ? 'Sign Up' : 'Sign In'}
       </Text>
+      {/* Form inputs */}
       {isSignUp && (
         <TextInput
-        label="Name"
-        value={name}
-        onChangeText={setName}
-        mode="outlined"
-        style={styles.input}
-      />
+          label="Name"
+          value={name}
+          onChangeText={setName}
+          mode="outlined"
+          style={styles.input}
+        />
       )}
       <TextInput
         label="Email"
@@ -79,9 +104,11 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
           style={styles.input}
         />
       )}
+      {/* Authentication button */}
       <Button mode="contained" onPress={handleAuth} style={styles.button}>
         {isSignUp ? 'Sign Up' : 'Sign In'}
       </Button>
+      {/* Toggle between sign in and sign up */}
       <Button
         mode="text"
         onPress={() => setIsSignUp(!isSignUp)}
@@ -93,6 +120,7 @@ const Auth: React.FC<AuthScreenProps> = ({ navigation }) => {
   );
 };
 
+// Styles for the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,

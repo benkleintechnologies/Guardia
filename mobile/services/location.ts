@@ -1,9 +1,21 @@
-// services/location.ts
+/**
+ * location.ts
+ * 
+ * This file contains functions for managing user location data.
+ * It interacts with Firebase Firestore to store and update user locations.
+ */
+
 import { db, serverTimestamp } from '../firebase';
 import { collection, query, where, getDocs, setDoc , doc } from 'firebase/firestore';
 
-
-// Function to update the user's location in the database, and create it if it doesn't exist
+/**
+ * Updates the user's location in the database, creating a new document if it doesn't exist
+ * 
+ * @param userId - The ID of the user
+ * @param teamId - The ID of the user's team
+ * @param latitude - The latitude coordinate of the user's location
+ * @param longitude - The longitude coordinate of the user's location
+ */
 export const updateLocation = async (userId: string, teamId: string, latitude: number, longitude: number) => {
     try {
         const locationsRef = collection(db, 'locations');
@@ -31,6 +43,7 @@ export const updateLocation = async (userId: string, teamId: string, latitude: n
             longitude,
             timestamp: serverTimestamp(),
         });
+        console.log("Location updated successfully!");
     } catch (error) {
         console.error('Error updating location:', error);
     }

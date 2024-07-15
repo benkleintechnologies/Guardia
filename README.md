@@ -32,7 +32,6 @@ The web development uses the MERN stack, while the mobile app utilizes React Nat
 
 Ensure you have the following installed:
 
-- **Node.js** (v14.x or higher)
 - **npm** (v6.x or higher)
 - **TypeScript** (globally installed)  
 
@@ -45,8 +44,6 @@ Ensure you have the following installed:
   ```sh
   npm install -g expo-cli
   ```
-
-- **MongoDB** (We're using an Atlas MongoDB cluster)
 
 ### Backend
 
@@ -82,9 +79,11 @@ None should be needed
 
 ## Usage
 
-### Backend Server
+### Database and Backend Server
 
-We're now using Firebase as the backend (for authentication and storing data in Firestore).
+We're now using Firebase as the backend (for authentication and storing data in Firestore). Console is here: <https://console.firebase.google.com/u/2/project/emergency-response-track-a7751/overview>
+
+The login is the google account in the group description.
 
 ### Web App
 
@@ -108,13 +107,12 @@ We're now using Firebase as the backend (for authentication and storing data in 
 
    or to debug, go to the run and debug tab in VSCode and select the "Debug Mobile (Expo)" configuration.
 
-   Only got iOS to run successfully using `npx react-native run-ios` 
+   Only got iOS to run successfully using `npx react-native run-ios`
 
 2. Access the mobile app using the Expo Go app on your mobile device by scanning the QR Code (or in a simulator on your device, using one of the other options).
 
 ## Features
 
-- The backend connects to the Atlas MongoDB cluster and retrieves sample data, including locations.
 - The mobile app is a basic React Native app with placeholder code.
 - The web app is built using React and Typescript.
 
