@@ -13,7 +13,7 @@ const SOSMessages: React.FC = () => {
   const [sosMessages, setSosMessages] = useState<SosData[]>([]);
   const mapRef = useRef<MapView>(null);
 
-  const centerOnUser = async () => {
+  const centerOnUser = async (userId) => {
     console.log("centerOnUser called (web)");
     let { status } = await ExpoLocation.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
@@ -59,7 +59,7 @@ const SOSMessages: React.FC = () => {
         {sosMessages.map((sos, index) => (
           <li key={index} className="row">
             <div className="recordText">User ID: {sos.userId} - Team: {sos.teamId} - Time: {sos.timestamp.toLocaleString()}</div>
-            <button className="button" onClick={centerOnUser}>
+            <button className="button" onClick={centerOnUser(sos.userId)}>
               Action
             </button>
           </li>
