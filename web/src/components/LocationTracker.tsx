@@ -1,3 +1,23 @@
+/**
+ * 
+ * This file was written before restructuring
+ * 
+ * It should be deleted at some point
+ * 
+ * Some code may be useful to be used elsewhere and that's why it was kept in the meantime
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
+
+
 // src/components/LocationTracker.tsx
 import { useState, useEffect } from 'react';
 import { db } from '../firebase';
