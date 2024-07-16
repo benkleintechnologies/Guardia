@@ -1,12 +1,13 @@
 // src/hooks/useAuth.ts
 import { useState, useEffect, useContext, createContext, ReactNode } from 'react';
-import { auth } from '../firebase';
-import { User, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, UserCredential } from 'firebase/auth';
+import { auth, db } from '../firebase';
+import { User, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, onAuthStateChanged, UserCredential } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 interface AuthContextProps {
     currentUser: User | null;
     initializing: boolean;
-    signUp: (email: string, password: string) => Promise<UserCredential>;
+    signUp: (name: string, email: string, password: string, teamId: string) => Promise<UserCredential>;
     signIn: (email: string, password: string) => Promise<UserCredential>;
     signOut: () => Promise<void>;
 }
@@ -18,20 +19,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [initializing, setInitializing] = useState(true);
 
     useEffect(() => {
-        //Get user from local storage if already logged in
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-            setCurrentUser(JSON.parse(storedUser));
-        }
-
-        //Set currentUser in local storage
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                setCurrentUser(user);
-                localStorage.setItem('currentUser', JSON.stringify(user));
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    setCurrentUser({ ...user, ...userData });
+                } else {
+                    setCurrentUser(user);
+                }
             } else {
                 setCurrentUser(null);
-                localStorage.removeItem('currentUser');
             }
             setInitializing(false);
         });
@@ -39,27 +37,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return unsubscribe;
     }, []);
 
-    const signUp = (email: string, password: string) => {
-        return createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
-            setCurrentUser(userCredential.user);
-            localStorage.setItem('currentUser', JSON.stringify(userCredential.user)); //Save user login
-            return userCredential;
+    const signUp = async (name: string, email: string, password: string, teamId: string) => {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        await setDoc(doc(db, 'users', user.uid), {
+            userId: user.uid,
+            name: name,
+            teamId: teamId,
+            role: 'volunteer',
+            canViewOthers: false,
         });
+
+        setCurrentUser({ ...user });
+        return userCredential;
     };
 
-    const signIn = (email: string, password: string) => {
-        return signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
-            setCurrentUser(userCredential.user);
-            localStorage.setItem('currentUser', JSON.stringify(userCredential.user)); //Save user login
-            return userCredential;
-        });
+    const signIn = async (email: string, password: string) => {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setCurrentUser({ ...user, ...userData });
+        } else {
+            setCurrentUser(user);
+        }
+
+        return userCredential;
     };
 
-    const signOutUser = () => {
-        return signOut(auth).then(() => {
-            setCurrentUser(null);
-            localStorage.removeItem('currentUser');
-        });
+    const signOutUser = async () => {
+        await firebaseSignOut(auth);
+        setCurrentUser(null);
     };
 
     const value = {

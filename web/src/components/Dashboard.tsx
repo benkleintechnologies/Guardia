@@ -46,6 +46,10 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleSosClick = (latitude: number, longitude: number) => {
+    setFocusedLocation({ lat: latitude, lng: longitude });
+  };
+
   const handleViewAllUsers = () => {
     setFocusedLocation(null);
   };
@@ -73,7 +77,7 @@ const Dashboard: React.FC = () => {
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <UserList onUserClick={handleUserClick} locations={locations} />
           <Box sx={{ mt: 2 }}>
-            <SOSMessages />
+            <SOSMessages onSosClick={handleSosClick} />
           </Box>
         </Box>
       </Box>
