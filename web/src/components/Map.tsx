@@ -1,7 +1,7 @@
 // src/components/Map.tsx
 
 import React, { useEffect, useState, useRef } from 'react';
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import { db } from '../firebase';
 import { collection, onSnapshot, doc, getDoc, query, where, orderBy } from 'firebase/firestore';
 import { Location, SosData } from '../types';
@@ -133,6 +133,30 @@ const Map: React.FC<MapProps> = ({ locations, focusedLocation, onViewAllUsers })
           onClick={() => setSelectedMarker(location)}
         />
       ))}
+
+       {selectedMarker && (
+        <CustomInfoWindow
+          position={{ lat: selectedMarker.latitude, lng: selectedMarker.longitude }}
+          onCloseClick={() => setSelectedMarker(null)}
+          userId={userNames[selectedMarker.userId] || 'Loading...'}
+          teamId={selectedMarker.teamId}
+        />
+      )}
+      <Button
+        variant="contained"
+        color="primary"
+        startIcon={<ZoomOutMapIcon />}
+        style={{
+          position: 'absolute',
+          bottom: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 1000,
+        }}
+        onClick={onViewAllUsers}
+      >
+        View All Users
+      </Button>
     </GoogleMap>
   );
 };
