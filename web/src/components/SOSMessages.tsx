@@ -12,7 +12,11 @@ interface SosMessage extends SosData {
   timestamp: Date;
 }
 
-const SOSMessages: React.FC = () => {
+interface SOSMessagesProps {
+  onSosClick: (latitude: number, longitude: number) => void;
+}
+
+const SOSMessages: React.FC<SOSMessagesProps> = ({ onSosClick }) => {
   const [sosMessages, setSosMessages] = useState<SosMessage[]>([]);
 
   useEffect(() => {
@@ -52,7 +56,12 @@ const SOSMessages: React.FC = () => {
       </Typography>
       <List>
         {sosMessages.map((sos, index) => (
-          <ListItem key={index} divider>
+          <ListItem 
+            key={index} 
+            divider 
+            button 
+            onClick={() => onSosClick(sos.latitude, sos.longitude)}
+          >
             <ErrorIcon color="error" sx={{ mr: 2 }} />
             <ListItemText
               primary={
