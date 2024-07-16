@@ -55,7 +55,7 @@ const Dashboard: React.FC = () => {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Dashboard
+            Guardia
           </Typography>
           <Button color="inherit" onClick={handleSignOut} startIcon={<ExitToAppIcon />}>
             Sign Out
