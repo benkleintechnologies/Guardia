@@ -5,7 +5,12 @@ import Dashboard from './components/Dashboard';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, initializing } = useAuth();
+
+  if (initializing) {
+    return <div>Loading...</div>; // or a spinner
+  }
+
   return <>{currentUser ? children : <Navigate to="/auth" replace />}</>;
 };
 

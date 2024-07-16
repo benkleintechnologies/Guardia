@@ -7,15 +7,39 @@ import { collection, onSnapshot, doc, getDoc, query, where, orderBy } from 'fire
 import { Location, SosData } from '../types';
 import CustomMarker from './CustomMarker';
 import CustomInfoWindow from './CustomInfoWindow';
-
+import { Button } from '@mui/material';
+import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 
 const mapContainerStyle = {
   width: '100%',
   height: '100%',
 };
 
-const Map: React.FC = () => {
-  const [locations, setLocations] = useState<Location[]>([]);
+const mapOptions: google.maps.MapOptions = {
+  disableDefaultUI: true,
+  zoomControl: true,
+  mapTypeControl: false,
+  streetViewControl: false,
+  styles: [
+    {
+      featureType: 'poi',
+      elementType: 'labels',
+      stylers: [{ visibility: 'off' }]
+    },
+    {
+      featureType: "transit",
+      stylers: [{ visibility: "off" }]
+    }
+  ]
+};
+
+interface MapProps {
+  locations: Location[];
+  focusedLocation: { lat: number; lng: number } | null;
+  onViewAllUsers: () => void;
+}
+
+const Map: React.FC<MapProps> = ({ locations, focusedLocation, onViewAllUsers }) => {
   const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
   const [sosUsers, setSosUsers] = useState<Set<string>>(new Set());
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -28,21 +52,6 @@ const Map: React.FC = () => {
 
   useEffect(() => {
     if (!isLoaded) return;
-
-    const unsubscribeLocations = onSnapshot(collection(db, 'locations'), (snapshot) => {
-      const locationsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...(doc.data() as Omit<Location, 'id'>),
-        timestamp: doc.data().timestamp.toDate(),
-      }));
-      setLocations(locationsData);
-
-      if (locationsData.length > 0 && mapRef.current) {
-        const bounds = new google.maps.LatLngBounds();
-        locationsData.forEach(loc => bounds.extend({ lat: loc.latitude, lng: loc.longitude }));
-        mapRef.current.fitBounds(bounds);
-      }
-    });
 
     const unsubscribeSos = onSnapshot(
       query(
@@ -61,7 +70,6 @@ const Map: React.FC = () => {
     );
 
     return () => {
-      unsubscribeLocations();
       unsubscribeSos();
     };
   }, [isLoaded]);
@@ -86,6 +94,20 @@ const Map: React.FC = () => {
     }
   }, [locations]);
 
+  // Focus location passed as prop
+  useEffect(() => {
+    if (isLoaded && mapRef.current) {
+      if (focusedLocation) {
+        mapRef.current.panTo(focusedLocation);
+        mapRef.current.setZoom(18);
+      } else {
+        const bounds = new google.maps.LatLngBounds();
+        locations.forEach(loc => bounds.extend({ lat: loc.latitude, lng: loc.longitude }));
+        mapRef.current.fitBounds(bounds);
+      }
+    }
+  }, [isLoaded, locations, focusedLocation]);
+
   const onMapLoad = (map: google.maps.Map) => {
     mapRef.current = map;
   };
@@ -97,6 +119,7 @@ const Map: React.FC = () => {
       mapContainerStyle={mapContainerStyle}
       zoom={10}
       onLoad={onMapLoad}
+      options={mapOptions}
     >
       {locations.map(location => (
         <Marker
@@ -110,16 +133,6 @@ const Map: React.FC = () => {
           onClick={() => setSelectedMarker(location)}
         />
       ))}
-
-       {selectedMarker && (
-        <CustomInfoWindow
-          position={{ lat: selectedMarker.latitude, lng: selectedMarker.longitude }}
-          onCloseClick={() => setSelectedMarker(null)}
-          userId={userNames[selectedMarker.userId] || 'Loading...'}
-          teamId={selectedMarker.teamId}
-        />
-      )}
-
     </GoogleMap>
   );
 };

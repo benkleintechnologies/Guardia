@@ -2,23 +2,40 @@
 
 import React, { useEffect, useState } from 'react';
 import { db } from '../firebase';
-import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
-import { SosData } from '../types';
+import { collection, onSnapshot, query, where, orderBy, doc, getDoc, Timestamp } from 'firebase/firestore';
+import { SosData, User } from '../types';
+import { List, ListItem, ListItemText, Paper, Typography, Box } from '@mui/material';
+import ErrorIcon from '@mui/icons-material/Error';
+
+interface SosMessage extends SosData {
+  userName: string;
+  timestamp: Date;
+}
 
 const SOSMessages: React.FC = () => {
-  const [sosMessages, setSosMessages] = useState<SosData[]>([]);
+  const [sosMessages, setSosMessages] = useState<SosMessage[]>([]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
       query(
         collection(db, 'sos'),
-        where('timestamp', '>', new Date(Date.now() - 10 * 60 * 1000)),
+        where('timestamp', '>', Timestamp.fromMillis(Date.now() - 10 * 60 * 1000)),
         orderBy('timestamp', 'desc')
       ),
-      (snapshot) => {
-        const sosData = snapshot.docs.map(doc => ({
-          ...doc.data() as SosData,
-          timestamp: doc.data().timestamp.toDate(),
+      async (snapshot) => {
+        const sosData = await Promise.all(snapshot.docs.map(async (snapshotDoc) => {
+          const data = snapshotDoc.data() as SosData;
+          const userDoc = await getDoc(doc(db, 'users', data.userId));
+          const userData = userDoc.data() as User;
+
+          // Convert Firestore Timestamp to JavaScript Date
+          const date = (data.timestamp as unknown as Timestamp).toDate();
+
+          return {
+            ...data,
+            timestamp: date,
+            userName: userData?.name || 'Unknown User',
+          };
         }));
         setSosMessages(sosData);
       }
@@ -27,17 +44,34 @@ const SOSMessages: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
+
   return (
-    <div>
-      <h2>SOS Messages</h2>
-      <ul>
+    <Paper elevation={3} sx={{ p: 2, maxHeight: '50vh', overflow: 'auto' }}>
+      <Typography variant="h6" gutterBottom>
+        SOS Messages
+      </Typography>
+      <List>
         {sosMessages.map((sos, index) => (
-          <li key={index}>
-            User ID: {sos.userId} - Team: {sos.teamId} - Time: {sos.timestamp.toLocaleString()}
-          </li>
+          <ListItem key={index} divider>
+            <ErrorIcon color="error" sx={{ mr: 2 }} />
+            <ListItemText
+              primary={
+                <Typography variant="subtitle1" color="error">
+                  {sos.userName} - Team: {sos.teamId}
+                </Typography>
+              }
+              secondary={
+                <Box component="span" sx={{ display: 'block' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Time: {sos.timestamp.toLocaleString()}
+                  </Typography>
+                </Box>
+              }
+            />
+          </ListItem>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Paper>
   );
 };
 
