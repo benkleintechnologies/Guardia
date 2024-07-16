@@ -1,17 +1,29 @@
-// src/App.tsx
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { AuthProvider } from './hooks/useAuth';
-import { Auth } from './components/Auth';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Auth from './components/Auth';
 import Dashboard from './components/Dashboard';
+import { AuthProvider, useAuth } from './hooks/useAuth';
 
-const App: React.FC = () => {
+const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
+  const { currentUser } = useAuth();
+  return <>{currentUser ? children : <Navigate to="/auth" replace />}</>;
+};
+
+const App = () => {
   return (
     <AuthProvider>
       <Router>
         <Routes>
           <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

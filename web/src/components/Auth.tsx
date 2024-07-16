@@ -2,16 +2,19 @@
 import { useState } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 export const Auth = () => {
     const { signUp, signIn, signOut, currentUser } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     const handleSignUp = async () => {
         try {
             await signUp(email, password);
             alert('User created successfully');
+            navigate('/dashboard');
         } catch (error) {
             alert('Error signing up');
         }
@@ -21,6 +24,7 @@ export const Auth = () => {
         try {
             await signIn(email, password);
             alert('Signed in successfully');
+            navigate('/dashboard');
         } catch (error) {
             alert('Error signing in');
         }
