@@ -14,6 +14,10 @@ jobs:
       - name: Install Dependencies
         run: npm install
         working-directory: web
+      - name: Set API Key Environment Variable
+        run: echo "REACT_APP_GOOGLE_MAPS_API_KEY=${{ secrets.REACT_APP_GOOGLE_MAPS_API_KEY }}" >> web/.env
+        env:
+          REACT_APP_GOOGLE_MAPS_API_KEY: ${{ secrets.REACT_APP_GOOGLE_MAPS_API_KEY }}
       - name: Build Project
         run: npm run build
         working-directory: web
