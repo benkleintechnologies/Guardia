@@ -13,7 +13,7 @@ export const Auth = () => {
     const handleSignUp = async () => {
         try {
             await signUp(email, password);
-            alert('User created successfully');
+            console.log('User created successfully');
             navigate('/dashboard');
         } catch (error) {
             alert('Error signing up');
@@ -23,7 +23,7 @@ export const Auth = () => {
     const handleSignIn = async () => {
         try {
             await signIn(email, password);
-            alert('Signed in successfully');
+            console.log('Signed in successfully');
             navigate('/dashboard');
         } catch (error) {
             alert('Error signing in');
@@ -33,7 +33,8 @@ export const Auth = () => {
     const handleSignOut = async () => {
         try {
             await signOut();
-            alert('Signed out successfully');
+            console.log('Signed out successfully');
+            navigate('/auth');
         } catch (error) {
             alert('Error signing out');
         }
