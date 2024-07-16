@@ -6,6 +6,7 @@ import { db } from '../firebase';
 import { collection, onSnapshot, doc, getDoc, query, where, orderBy } from 'firebase/firestore';
 import { Location, SosData } from '../types';
 import CustomMarker from './CustomMarker';
+import CustomInfoWindow from './CustomInfoWindow';
 import { Button } from '@mui/material';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 
@@ -42,6 +43,7 @@ const Map: React.FC<MapProps> = ({ locations, focusedLocation, onViewAllUsers })
   const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
   const [sosUsers, setSosUsers] = useState<Set<string>>(new Set());
   const mapRef = useRef<google.maps.Map | null>(null);
+  const [selectedMarker, setSelectedMarker] = useState<Location | null>(null);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -128,8 +130,18 @@ const Map: React.FC<MapProps> = ({ locations, focusedLocation, onViewAllUsers })
             url: sosUsers.has(location.userId) ? CustomMarker('red') : CustomMarker('blue'),
             scaledSize: new google.maps.Size(30, 30),
           }}
+          onClick={() => setSelectedMarker(location)}
         />
       ))}
+
+       {selectedMarker && (
+        <CustomInfoWindow
+          position={{ lat: selectedMarker.latitude, lng: selectedMarker.longitude }}
+          onCloseClick={() => setSelectedMarker(null)}
+          userId={userNames[selectedMarker.userId] || 'Loading...'}
+          teamId={selectedMarker.teamId}
+        />
+      )}
       <Button
         variant="contained"
         color="primary"
