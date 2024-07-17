@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signOut, User as FirebaseUser } from 'firebase/auth';
 import { auth, db } from '../firebase';
-import { collection, onSnapshot, query, where, doc, getDoc } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, doc, getDoc, getDocs } from 'firebase/firestore';
 import Map from './Map';
 import UserList from './UserList';
 import SOSMessages from './SOSMessages';
@@ -53,6 +53,22 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     if (!currentUser?.teamId) return;
 
+    // Fetch team visibility settings
+    const fetchTeamVisibility = async () => {
+      const teamQuery = query(collection(db, 'users'), where('teamId', '==', currentUser.teamId));
+      const teamSnapshot = await getDocs(teamQuery);
+      const allUsersCanView = teamSnapshot.docs.every(doc => doc.data().canViewOthers);
+      const noUsersCanView = teamSnapshot.docs.every(doc => !doc.data().canViewOthers);
+      
+      if (allUsersCanView) {
+        setTeamLocationsVisible(true);
+      } else if (noUsersCanView) {
+        setTeamLocationsVisible(false);
+      } else {
+        setTeamLocationsVisible(true); // Default to true if some users can view
+      }
+    };    
+
     const fetchLocations = async () => {
       // Fetch locations for the current team
       const teamLocationsQuery = query(collection(db, 'locations'), where('teamId', '==', currentUser.teamId));
@@ -90,6 +106,7 @@ const Dashboard: React.FC = () => {
       };
     };
 
+    fetchTeamVisibility();
     fetchLocations();
   }, [currentUser]);
 
@@ -118,10 +135,21 @@ const Dashboard: React.FC = () => {
   };
 
   const handleToggleTeamLocations = async () => {
-    const newValue = !teamLocationsVisible;
-    setTeamLocationsVisible(newValue);
+    if (teamLocationsVisible === null) {
+      // If mixed state, set all to true
+      setTeamLocationsVisible(true);
+    } else {
+      const newValue = !teamLocationsVisible;
+      setTeamLocationsVisible(newValue);
+    }
+    
     if (currentUser) {
-      await updateTeamVisibility(currentUser.uid, currentUser.teamId, newValue);
+      const teamQuery = query(collection(db, 'users'), where('teamId', '==', currentUser.teamId));
+      const teamSnapshot = await getDocs(teamQuery);
+      
+      teamSnapshot.docs.forEach(async (userDoc) => {
+        await updateTeamVisibility(userDoc.id, currentUser.teamId, teamLocationsVisible === null ? true : !teamLocationsVisible);
+      });
     }
   };
 
