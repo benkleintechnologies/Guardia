@@ -5,24 +5,22 @@
  * It uses react-native-maps for the map functionality and integrates with Firebase for real-time location updates.
  */
 
-import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity, Alert, Button } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import MapView, { Marker, MapViewProps } from 'react-native-maps';
-import { db, serverTimestamp } from '../firebase';
-import { collection, onSnapshot, doc, getDoc, setDoc, query, where, orderBy } from 'firebase/firestore';
+import { db } from '../firebase';
+import { collection, onSnapshot, doc, getDoc, query, where, orderBy } from 'firebase/firestore';
 import { Location } from '../types';
-import { FontAwesome } from '@expo/vector-icons';
 import CustomMarker from './CustomMarker';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as ExpoLocation from 'expo-location';
 
 interface MapProps extends MapViewProps {
   mapRef: React.RefObject<MapView>;
   onCenterPress: () => void;
-  onRefocusPress: () => void; // New prop for refocus button
-  setLocations: (locations: Location[]) => void; // New prop to set locations in parent component
+  onRefocusPress: () => void;
+  setLocations: (locations: Location[]) => void;
 }
 
 interface SosData {
@@ -46,34 +44,83 @@ const Map = ({ mapRef, onCenterPress, onRefocusPress, setLocations }: MapProps) 
   const [locations, setLocalLocations] = useState<Location[]>([]);
   const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
   const [sosUsers, setSosUsers] = useState<Set<string>>(new Set());
+  const [userId, setUserId] = useState<string | null>(null);
+  const [teamId, setTeamId] = useState<string | null>(null);
+  const [canViewOthers, setCanViewOthers] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const updateSosUsers = useCallback((sosData: SosData[]) => {
+    const sosUserSet = new Set(sosData.map(sos => sos.userId));
+    setSosUsers(sosUserSet);
+  }, []);
 
   useEffect(() => {
-    // Set up real-time listener for location updates from Firebase
-    const unsubscribeLocations = onSnapshot(collection(db, 'locations'), (snapshot) => {
+    const fetchUserData = async () => {
+      try {
+        setIsLoading(true);
+        const storedUserId = await AsyncStorage.getItem('userId');
+        if (!storedUserId) {
+          console.error('UserId is null');
+          return;
+        }
+        setUserId(storedUserId);
+
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const userDocRef = doc(db, 'users', userId);
+    
+    const unsubscribeUserDoc = onSnapshot(userDocRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const userData = docSnapshot.data();
+        setTeamId(userData.teamId);
+        setCanViewOthers(userData.canViewOthers);
+      }
+    }, (error) => {
+      console.error("Error listening to user document:", error);
+    });
+
+    return () => {
+      unsubscribeUserDoc();
+    };
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId || !teamId) return;
+
+    setIsLoading(true);
+
+    let locationsQuery;
+    if (canViewOthers) {
+      locationsQuery = query(collection(db, 'locations'), where('teamId', '==', teamId));
+    } else {
+      locationsQuery = query(collection(db, 'locations'), where('userId', '==', userId));
+    }
+
+    const unsubscribeLocations = onSnapshot(locationsQuery, (snapshot) => {
       const locationsData = snapshot.docs.map(doc => ({
         id: doc.id,
         ...(doc.data() as Location)
       })) as Location[];
       setLocalLocations(locationsData);
       setLocations(locationsData);
-
-      // Fit map to show all markers
-      if (locationsData.length > 0) {
-        const coordinates = locationsData.map(loc => ({
-          latitude: loc.latitude,
-          longitude: loc.longitude
-        }));
-        mapRef.current?.fitToCoordinates(coordinates, {
-          edgePadding: { top: 100, right: 50, bottom: 100, left: 50 },
-          animated: true,
-        });
-      }
+      setIsLoading(false);
     });
 
     const unsubscribeSos = onSnapshot(
       query(
         collection(db, 'sos'),
-        where('timestamp', '>', new Date(Date.now() - 10 * 60 * 1000)), //Within last 10 minutes
+        where('timestamp', '>', new Date(Date.now() - 10 * 60 * 1000)),
         orderBy('timestamp', 'desc')
       ),
       (snapshot) => {
@@ -85,8 +132,7 @@ const Map = ({ mapRef, onCenterPress, onRefocusPress, setLocations }: MapProps) 
           longitude: doc.data().longitude,
         })) as SosData[];
         
-        const sosUserSet = new Set(sosData.map(sos => sos.userId));
-        setSosUsers(sosUserSet);
+        updateSosUsers(sosData.filter(sos => sos.teamId === teamId));
       }
     );
 
@@ -94,7 +140,7 @@ const Map = ({ mapRef, onCenterPress, onRefocusPress, setLocations }: MapProps) 
       unsubscribeLocations();
       unsubscribeSos();
     };
-  }, [mapRef]);
+  }, [userId, teamId, canViewOthers, mapRef, updateSosUsers]);
 
   useEffect(() => {
     const fetchUserNames = async () => {
@@ -116,10 +162,30 @@ const Map = ({ mapRef, onCenterPress, onRefocusPress, setLocations }: MapProps) 
     }
   }, [locations]);
 
+  useEffect(() => {
+    if (locations.length > 0) {
+      const coordinates = locations.map(loc => ({
+        latitude: loc.latitude,
+        longitude: loc.longitude
+      }));
+      mapRef.current?.fitToCoordinates(coordinates, {
+        edgePadding: { top: 100, right: 50, bottom: 100, left: 50 },
+        animated: true,
+      });
+    }
+  }, [locations, canViewOthers, mapRef]);
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <MapView ref={mapRef} style={styles.map}>
-        {/* Render markers for each location */}
         {locations.map(location => (
           <Marker
             key={location.userId}
@@ -128,7 +194,6 @@ const Map = ({ mapRef, onCenterPress, onRefocusPress, setLocations }: MapProps) 
             description={`Team: ${location.teamId}`}
           >
             <CustomMarker color={sosUsers.has(location.userId) ? 'red' : 'blue'} />
-            {/*<FontAwesome name="map-marker" size={24} color="#ff0000" />*/}
           </Marker>
         ))}
       </MapView>
@@ -180,6 +245,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 4,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
