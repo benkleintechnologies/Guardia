@@ -17,7 +17,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 const App = () => {
   return (
     <AuthProvider>
-      <Router>
+      <Router basename="/">
         <Routes>
           <Route path="/auth" element={<Auth />} />
           <Route
@@ -29,6 +29,7 @@ const App = () => {
             }
           />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </AuthProvider>
