@@ -17,8 +17,7 @@
       "react",
       "react-native",
       "jest",
-      "expo",
-      "react-native-background-geolocation"
+      "expo"
     ]
   },
   "include": [

@@ -1,5 +1,8 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: "com.facebook.react"
 apply plugin: 'com.google.gms.google-services'
 
@@ -58,6 +61,11 @@ react {
     //
     //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
     // hermesFlags = ["-O", "-output-source-map"]
+    //
+    // Added by install-expo-modules
+    entryFile = file(["node", "-e", "require('expo/scripts/resolveAppEntry')", rootDir.getAbsoluteFile().getParentFile().getAbsolutePath(), "android", "absolute"].execute(null, rootDir).text.trim())
+    cliFile = new File(["node", "--print", "require.resolve('@expo/cli')"].execute(null, rootDir).text.trim())
+    bundleCommand = "export:embed"
 }
 
 /**
@@ -80,13 +88,13 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
 // @generated begin react-native-background-geolocation-project - expo prebuild (DO NOT MODIFY) sync-451bbca0f2f08c9fc8b21a201ef5b476b165ba21
-def background_geolocation = project(':react-native-background-geolocation')
+// def background_geolocation = project(':react-native-background-geolocation') no longer using transistorsoft
 apply from: "${background_geolocation.projectDir}/app.gradle"
 // @generated end react-native-background-geolocation-project
     ndkVersion rootProject.ext.ndkVersion
 
     buildToolsVersion rootProject.ext.buildToolsVersion
-    compileSdk rootProject.ext.compileSdkVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
 
     namespace "com.trackerapp"
     defaultConfig {
@@ -95,6 +103,7 @@ apply from: "${background_geolocation.projectDir}/app.gradle"
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0.0"
+        multiDexEnabled true
     }
     signingConfigs {
         debug {
@@ -115,9 +124,11 @@ apply from: "${background_geolocation.projectDir}/app.gradle"
             shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-// @generated begin react-native-background-geolocation-proguard - expo prebuild (DO NOT MODIFY) sync-606db7f838db1722ea0ff547adceb798272bd706
-	    proguardFiles "${background_geolocation.projectDir}/proguard-rules.pro"
-// @generated end react-native-background-geolocation-proguard
+        // @generated begin react-native-background-geolocation-proguard - expo prebuild (DO NOT MODIFY) sync-606db7f838db1722ea0ff547adceb798272bd706
+	    // proguardFiles "${background_geolocation.projectDir}/proguard-rules.pro" // no longer using transistorsoft
+        proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+        // @generated end react-native-background-geolocation-proguard
         }
     }
     packagingOptions {
@@ -125,6 +136,17 @@ apply from: "${background_geolocation.projectDir}/app.gradle"
             useLegacyPackaging (findProperty('expo.useLegacyPackaging')?.toBoolean() ?: false)
         }
     }
+    compileOptions {
+        // sourceCompatibility rootProject.ext.javaVersion
+        // targetCompatibility rootProject.ext.javaVersion
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        // jvmTarget = '17'
+        jvmTarget = "1.8"
+    }
+
 }
 
 // Apply static values from `gradle.properties` to the `android.packagingOptions`
@@ -160,9 +182,11 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:26.0.0')
     implementation('com.google.firebase:firebase-analytics')
     implementation("com.facebook.react:react-android")
+    implementation("com.facebook.react:react-native:+")
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation(name: 'tsbackgroundfetch-1.0.2', ext: 'aar')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    //implementation(name: 'tsbackgroundfetch-1.0.2', ext: 'aar')
 
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";

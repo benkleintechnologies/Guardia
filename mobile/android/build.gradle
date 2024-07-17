@@ -6,43 +6,46 @@ buildscript {
         minSdkVersion = Integer.parseInt(findProperty('android.minSdkVersion') ?: '23')
         compileSdkVersion = Integer.parseInt(findProperty('android.compileSdkVersion') ?: '34')
         targetSdkVersion = Integer.parseInt(findProperty('android.targetSdkVersion') ?: '34')
-        kotlinVersion = findProperty('android.kotlinVersion') ?: '1.9.23'
+        javaVersion = JavaVersion.VERSION_17
+        kotlinVersion = '1.9.23'
 
         ndkVersion = "26.1.10909125"
     }
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://maven.transistorsoft.com' }
+        // maven { url 'https://github.com/transistorsoft/cordova-background-geolocation-lt.git' } // no longer using transistorsoft
     }
     dependencies {
-        classpath ('com.android.tools.build:gradle:8.4.0')
-        classpath('com.google.gms:google-services:4.3.14')
-        classpath('com.facebook.react:react-native-gradle-plugin')
-        classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
+        classpath 'com.android.tools.build:gradle:8.2'
+        classpath 'com.google.gms:google-services:4.3.14'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath 'com.facebook.react:react-native-gradle-plugin'
     }
 }
 
-apply plugin: "com.facebook.react.rootproject"
+// apply plugin: "com.facebook.react.rootproject"
 
 allprojects {
     repositories {
         maven {
-// @generated begin react-native-background-geolocation-maven - expo prebuild (DO NOT MODIFY) sync-4b2bae87fd8579c445d8885f6bdc8542d9d0bbca
-	maven { url "${project(":react-native-background-geolocation").projectDir}/libs" }
-	maven { url 'https://developer.huawei.com/repo/' }
-// @generated end react-native-background-geolocation-maven
+            url("${project(':react-native-background-fetch').projectDir}/libs") 
+            // maven { url "${project(':background_fetch').projectDir}/libs" }
+
+            // @generated begin react-native-background-geolocation-maven - expo prebuild (DO NOT MODIFY) sync-4b2bae87fd8579c445d8885f6bdc8542d9d0bbca
+	        // url "${project(":react-native-background-geolocation").projectDir}/libs" //no longer using transistorsoft
+	        url 'https://developer.huawei.com/repo/' 
+            // @generated end react-native-background-geolocation-maven
+
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url(new File(['node', '--print', "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim(), '../android'))
-        }
-        maven {
+        
             // Android JSC is installed from npm
             url(new File(['node', '--print', "require.resolve('jsc-android/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim(), '../dist'))
         }
-
         google()
         mavenCentral()
         // maven { url 'https://www.jitpack.io' } //replaced with below line
-        maven { url 'https://maven.transistorsoft.com' }
+        // maven { url 'https://github.com/transistorsoft/cordova-background-geolocation-lt.git' } // no longer using transistorsoft
     }
 }
