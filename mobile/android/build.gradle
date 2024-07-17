@@ -14,7 +14,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://github.com/transistorsoft/cordova-background-geolocation-lt.git' }
+        // maven { url 'https://github.com/transistorsoft/cordova-background-geolocation-lt.git' } // no longer using transistorsoft
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.2'
@@ -33,7 +33,7 @@ allprojects {
             // maven { url "${project(':background_fetch').projectDir}/libs" }
 
             // @generated begin react-native-background-geolocation-maven - expo prebuild (DO NOT MODIFY) sync-4b2bae87fd8579c445d8885f6bdc8542d9d0bbca
-	        url "${project(":react-native-background-geolocation").projectDir}/libs" 
+	        // url "${project(":react-native-background-geolocation").projectDir}/libs" //no longer using transistorsoft
 	        url 'https://developer.huawei.com/repo/' 
             // @generated end react-native-background-geolocation-maven
 
@@ -46,6 +46,6 @@ allprojects {
         google()
         mavenCentral()
         // maven { url 'https://www.jitpack.io' } //replaced with below line
-        maven { url 'https://github.com/transistorsoft/cordova-background-geolocation-lt.git' }
+        // maven { url 'https://github.com/transistorsoft/cordova-background-geolocation-lt.git' } // no longer using transistorsoft
     }
 }

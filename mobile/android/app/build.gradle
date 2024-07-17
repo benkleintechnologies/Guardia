@@ -88,7 +88,7 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
 // @generated begin react-native-background-geolocation-project - expo prebuild (DO NOT MODIFY) sync-451bbca0f2f08c9fc8b21a201ef5b476b165ba21
-def background_geolocation = project(':react-native-background-geolocation')
+// def background_geolocation = project(':react-native-background-geolocation') no longer using transistorsoft
 apply from: "${background_geolocation.projectDir}/app.gradle"
 // @generated end react-native-background-geolocation-project
     ndkVersion rootProject.ext.ndkVersion
@@ -124,9 +124,11 @@ apply from: "${background_geolocation.projectDir}/app.gradle"
             shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-// @generated begin react-native-background-geolocation-proguard - expo prebuild (DO NOT MODIFY) sync-606db7f838db1722ea0ff547adceb798272bd706
-	    proguardFiles "${background_geolocation.projectDir}/proguard-rules.pro"
-// @generated end react-native-background-geolocation-proguard
+        // @generated begin react-native-background-geolocation-proguard - expo prebuild (DO NOT MODIFY) sync-606db7f838db1722ea0ff547adceb798272bd706
+	    // proguardFiles "${background_geolocation.projectDir}/proguard-rules.pro" // no longer using transistorsoft
+        proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+        // @generated end react-native-background-geolocation-proguard
         }
     }
     packagingOptions {
