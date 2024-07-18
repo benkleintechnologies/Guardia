@@ -333,7 +333,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginHorizontal: 5,
     },
-        toggleButtonContainer: {
+    toggleButtonContainer: {
+        flex: 1,
         backgroundColor: '#0000ff',
         padding: 10,
         borderRadius: 5,
