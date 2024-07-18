@@ -43,6 +43,6 @@ allprojects {
         google()
         mavenCentral()
         // maven { url 'https://www.jitpack.io' } //replaced with below line
-        maven { url 'https://maven.transistorsoft.com' }
+        maven { url 'https://developer.huawei.com/repo/' }
     }
 }

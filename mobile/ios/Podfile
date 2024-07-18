@@ -11,10 +11,28 @@ platform :ios, podfile_properties['ios.deploymentTarget'] || '13.4'
 install! 'cocoapods', :deterministic_uuids => false
 
 prepare_react_native_project!
+use_modular_headers!
 
 target 'TrackerApp' do
   use_expo_modules!
   config = use_native_modules!
+
+  pod 'FirebaseCoreInternal', :modular_headers => true
+  pod 'GoogleUtilities', :modular_headers => true
+
+  # React Native dependencies
+  pod 'ReactCommon', :path => '../node_modules/react-native/ReactCommon'
+  pod 'React-RCTAppDelegate', :path => '../node_modules/react-native/Libraries/AppDelegate'
+  # pod 'React-Core', :path => '../node_modules/react-native'
+  # pod 'React-Core/RCTWebSocket', :path => '../node_modules/react-native/React/CoreModules'
+  pod 'React-CoreModules', :path => '../node_modules/react-native/React/CoreModules'
+  pod 'React-RCTBlob', :path => '../node_modules/react-native/Libraries/Blob'
+  pod 'React-RCTAnimation', :path => '../node_modules/react-native/Libraries/NativeAnimation'
+  pod 'React-RCTText', :path => '../node_modules/react-native/Libraries/Text'
+  pod 'React-RCTImage', :path => '../node_modules/react-native/Libraries/Image'
+  pod 'React-RCTNetwork', :path => '../node_modules/react-native/Libraries/Network'
+  pod 'React-RCTSettings', :path => '../node_modules/react-native/Libraries/Settings'
+  pod 'React-RCTLinking', :path => '../node_modules/react-native/Libraries/LinkingIOS'
 
   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
   use_frameworks! :linkage => ENV['USE_FRAMEWORKS'].to_sym if ENV['USE_FRAMEWORKS']
