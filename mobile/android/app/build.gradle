@@ -2,6 +2,7 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'kotlin-android'
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
@@ -167,9 +168,11 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation platform('com.google.firebase:firebase-bom:26.0.0')
     implementation('com.google.firebase:firebase-analytics')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation("com.facebook.react:react-android")
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation project(':expo-application')
     //implementation(name: 'tsbackgroundfetch-1.0.2', ext: 'aar')
 
 
