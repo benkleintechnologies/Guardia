@@ -13,10 +13,10 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://maven.transistorsoft.com' }
+        //maven { url 'https://maven.transistorsoft.com' }
     }
     dependencies {
-        classpath ('com.android.tools.build:gradle:8.4.0')
+        classpath('com.android.tools.build:gradle:8.4.0')
         classpath('com.google.gms:google-services:4.3.14')
         classpath('com.facebook.react:react-native-gradle-plugin')
         classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
@@ -26,10 +26,15 @@ buildscript {
 apply plugin: "com.facebook.react.rootproject"
 
 allprojects {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
+    }
     repositories {
         maven {
 // @generated begin react-native-background-geolocation-maven - expo prebuild (DO NOT MODIFY) sync-4b2bae87fd8579c445d8885f6bdc8542d9d0bbca
-	maven { url "${project(":react-native-background-geolocation").projectDir}/libs" }
+	//maven { url "${project(":react-native-background-geolocation").projectDir}/libs" }
 	maven { url 'https://developer.huawei.com/repo/' }
 // @generated end react-native-background-geolocation-maven
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
@@ -43,6 +48,6 @@ allprojects {
         google()
         mavenCentral()
         // maven { url 'https://www.jitpack.io' } //replaced with below line
-        maven { url 'https://maven.transistorsoft.com' }
+        //maven { url 'https://maven.transistorsoft.com' }
     }
 }

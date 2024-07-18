@@ -8,7 +8,7 @@
 import React, { useEffect, useState , useRef} from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import BackgroundGeolocation from 'react-native-background-geolocation';
+//import BackgroundGeolocation from 'react-native-background-geolocation';
 import { updateLocation } from '../services/location';
 import Map from '../components/Map';
 import { Location } from '../types';
@@ -37,7 +37,7 @@ const MainScreen = () => {
     
     console.log('Main component rendering, userID:', userId, ', teamId: ', teamId);
 
-    useEffect(() => {
+    /*useEffect(() => {
         // Fetch user data from AsyncStorage
         const fetchUserData = async () => {
             const storedUserId = await AsyncStorage.getItem('userId');
@@ -83,7 +83,7 @@ const MainScreen = () => {
         return () => {
             BackgroundGeolocation.removeAllListeners();
         };
-    }, [userId, teamId]);
+    }, [userId, teamId]);*/
 
     /**
      * Updates the current location when the component mounts

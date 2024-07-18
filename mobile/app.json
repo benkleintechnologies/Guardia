@@ -40,22 +40,6 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
-      ],
-      [
-        "react-native-background-geolocation",
-        {
-          "ios": {
-            "infoPlist": {
-              "UIBackgroundModes": ["location", "fetch"]
-            },  
-            "background": {
-              "modes": ["location", "fetch"]
-            }
-          },
-          "android": {
-            "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "ACCESS_BACKGROUND_LOCATION"]
-          }
-        }
       ]
     ],
     "experiments": {

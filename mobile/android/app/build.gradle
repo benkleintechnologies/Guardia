@@ -80,13 +80,13 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
 // @generated begin react-native-background-geolocation-project - expo prebuild (DO NOT MODIFY) sync-451bbca0f2f08c9fc8b21a201ef5b476b165ba21
-def background_geolocation = project(':react-native-background-geolocation')
-apply from: "${background_geolocation.projectDir}/app.gradle"
+//def background_geolocation = project(':react-native-background-geolocation')
+//apply from: "${background_geolocation.projectDir}/app.gradle"
 // @generated end react-native-background-geolocation-project
     ndkVersion rootProject.ext.ndkVersion
 
     buildToolsVersion rootProject.ext.buildToolsVersion
-    compileSdk rootProject.ext.compileSdkVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
 
     namespace "com.trackerapp"
     defaultConfig {
@@ -95,6 +95,14 @@ apply from: "${background_geolocation.projectDir}/app.gradle"
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0.0"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
     }
     signingConfigs {
         debug {
@@ -116,7 +124,7 @@ apply from: "${background_geolocation.projectDir}/app.gradle"
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
 // @generated begin react-native-background-geolocation-proguard - expo prebuild (DO NOT MODIFY) sync-606db7f838db1722ea0ff547adceb798272bd706
-	    proguardFiles "${background_geolocation.projectDir}/proguard-rules.pro"
+	    //proguardFiles "${background_geolocation.projectDir}/proguard-rules.pro"
 // @generated end react-native-background-geolocation-proguard
         }
     }
@@ -162,7 +170,7 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation(name: 'tsbackgroundfetch-1.0.2', ext: 'aar')
+    //implementation(name: 'tsbackgroundfetch-1.0.2', ext: 'aar')
 
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
