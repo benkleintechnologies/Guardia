@@ -338,7 +338,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#0000ff',
         padding: 10,
         borderRadius: 5,
-        margin: 5,
+        alignItems: 'center',
+        marginHorizontal: 5,
     }
 });
 
