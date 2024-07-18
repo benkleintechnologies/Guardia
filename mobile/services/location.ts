@@ -6,7 +6,7 @@
  */
 
 import { db, serverTimestamp } from '../firebase';
-import { collection, query, where, getDocs, setDoc , doc } from 'firebase/firestore';
+import { collection, query, where, getDocs, setDoc, doc, orderBy, limit } from 'firebase/firestore';
 
 /**
  * Updates the user's location in the database, creating a new document if it doesn't exist
@@ -46,5 +46,36 @@ export const updateLocation = async (userId: string, teamId: string, latitude: n
         console.log("Location updated successfully!");
     } catch (error) {
         console.error('Error updating location:', error);
+    }
+};
+
+/**
+ * Retrieves the last known location of a user from the database.
+ * 
+ * @param userId - The ID of the user
+ * @param teamId - The ID of the user's team
+ * @returns The last known location of the user as an object containing latitude and longitude.
+ */
+export const getLastKnownLocation = async (userId: string, teamId: string) => {
+    try {
+        const locationsRef = collection(db, 'locations');
+        const q = query(locationsRef, where('userId', '==', userId), orderBy('timestamp', 'desc'), limit(1));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.docs.length > 0) {
+            const doc = querySnapshot.docs[0];
+            const data = doc.data();
+            console.log("Location found for user.")
+            return {
+                latitude: data.latitude,
+                longitude: data.longitude
+            };
+        } else {
+            console.log("No location found for the user.");
+            return { latitude: 0, longitude: 0 };
+        }
+    } catch (error) {
+        console.error('Error retrieving last known location:', error);
+        return { latitude: 0, longitude: 0 };
     }
 };
