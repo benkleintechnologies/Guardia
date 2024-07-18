@@ -9,7 +9,8 @@ import React, { useEffect, useState , useRef} from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackgroundGeolocation from 'react-native-background-geolocation';
-import { updateLocation } from '../services/location';
+import { updateLocation, getLastKnownLocation } from '../services/location';
+import { Gyroscope, Pedometer } from 'expo-sensors';
 import Map from '../components/Map';
 import { Location } from '../types';
 import { signOut as apiSignOut } from '../services/auth';
@@ -34,6 +35,11 @@ const MainScreen = () => {
     const { signOut } = useAuth();
     const mapRef = useRef<MapView>(null);
     const isInitialRender = useRef(true);
+
+    const [isUsingGPS, setIsUsingGPS] = useState(true);
+    const [currentLocation, setCurrentLocation] = useState({ latitude: 0, longitude: 0 });
+    const [steps, setSteps] = useState(0);
+    const [gyroscopeData, setGyroscopeData] = useState({ x: 0, y: 0, z: 0 });
     
     console.log('Main component rendering, userID:', userId, ', teamId: ', teamId);
 
@@ -48,6 +54,21 @@ const MainScreen = () => {
 
         fetchUserData();
 
+        if (isUsingGPS) {
+            setupGPS();
+        } else {
+            setupINS();
+        }
+
+        return () => {
+            BackgroundGeolocation.removeAllListeners();
+            Gyroscope.removeAllListeners();
+            // Pedometer.removeAllListeners();
+        };
+    }, [userId, teamId, isUsingGPS]);
+        
+    const setupGPS = () => {
+        
         // Set up background geolocation
         BackgroundGeolocation.requestPermission().then((status) => {
             console.log('Permissions status:', status);
@@ -79,11 +100,49 @@ const MainScreen = () => {
 
         // Update location when component mounts
         updateCurrentLocation();
-
+        /*
         return () => {
             BackgroundGeolocation.removeAllListeners();
         };
     }, [userId, teamId]);
+    */};
+
+
+    const setupINS = async () => {
+        if (userId && teamId) {
+            const lastKnownLocation = await getLastKnownLocation(userId, teamId);
+            setCurrentLocation(lastKnownLocation);
+        }
+
+        Gyroscope.setUpdateInterval(1000);
+        // Pedometer.setUpdateInterval(1000);
+
+        Gyroscope.addListener((data) => {
+            setGyroscopeData(data);
+        });
+
+        const pedometerSubscription = Pedometer.watchStepCount((result) => {
+            setSteps(result.steps);
+            const distance = result.steps * 0.0008; // Approximate distance per step in degrees
+            const newLatitude = currentLocation.latitude + (gyroscopeData.y * distance);
+            const newLongitude = currentLocation.longitude + (gyroscopeData.x * distance);
+
+            if (userId && teamId) {
+                updateLocation(userId, teamId, newLatitude, newLongitude);
+                setCurrentLocation({ latitude: newLatitude, longitude: newLongitude });
+                console.log("Updating " + userId + "'s location to: lat: " + newLatitude + " longitude: " + newLongitude);
+            }
+        });
+        return () => {
+            pedometerSubscription.remove();
+        };
+    };
+
+    const toggleMode = () => {
+        setIsUsingGPS((prevState) => !prevState);
+    };
+
+
 
     /**
      * Updates the current location when the component mounts
@@ -227,6 +286,9 @@ const MainScreen = () => {
                     <TouchableOpacity style={styles.sosButtonContainer} onPress={sendSOS}>
                         <Text style={styles.buttonText}>SOS</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity style={styles.toggleButtonContainer} onPress={toggleMode}>
+                        <Text style={styles.buttonText}>{isUsingGPS ? 'Switch to INS' : 'Switch to GPS'}</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         </View>
@@ -274,6 +336,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginHorizontal: 5,
     },
+        toggleButtonContainer: {
+        backgroundColor: '#0000ff',
+        padding: 10,
+        borderRadius: 5,
+        margin: 5,
+    }
 });
 
 export default MainScreen;
