@@ -169,9 +169,12 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:26.0.0')
     implementation('com.google.firebase:firebase-analytics')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    implementation 'androidx.core:core-ktx:1.10.0'
     implementation("com.facebook.react:react-android")
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation project(':expo-application')
     //implementation(name: 'tsbackgroundfetch-1.0.2', ext: 'aar')
 
