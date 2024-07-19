@@ -7,7 +7,7 @@
 
 import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { auth } from '../firebase'; // Import Firebase auth
+//import { auth } from '../firebase'; // Import Firebase auth
 import { checkAuthStatus, signOut as authSignOut, getIdToken } from '../services/auth';
 
 /**

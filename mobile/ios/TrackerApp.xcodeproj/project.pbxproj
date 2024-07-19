@@ -21,7 +21,7 @@
 /* Begin PBXFileReference section */
 		0D2BE48F9CB7445A8677B521 /* TrackerApp-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "TrackerApp-Bridging-Header.h"; path = "TrackerApp/TrackerApp-Bridging-Header.h"; sourceTree = "<group>"; };
 		127F3E6120E44D318F0DDB00 /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "TrackerApp/noop-file.swift"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* TrackerApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackerApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* Guardia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Guardia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = TrackerApp/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = TrackerApp/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = TrackerApp/Images.xcassets; sourceTree = "<group>"; };
@@ -100,7 +100,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* TrackerApp.app */,
+				13B07F961A680F5B00A75B9A /* Guardia.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -162,7 +162,7 @@
 			);
 			name = TrackerApp;
 			productName = TrackerApp;
-			productReference = 13B07F961A680F5B00A75B9A /* TrackerApp.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* Guardia.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -374,7 +374,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FB916985361806E4C58A1F0E /* Pods-TrackerApp.debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = GuardiaAppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = TrackerApp/TrackerApp.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
@@ -385,6 +386,7 @@
 					"FB_SONARKIT_ENABLED=1",
 				);
 				INFOPLIST_FILE = TrackerApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Guardia;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -398,7 +400,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cachemoney613.KitatKonenutTracker;
-				PRODUCT_NAME = TrackerApp;
+				PRODUCT_NAME = Guardia;
 				SWIFT_OBJC_BRIDGING_HEADER = "TrackerApp/TrackerApp-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -411,12 +413,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3C29724575A070C1DFA16B5B /* Pods-TrackerApp.release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = GuardiaAppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = TrackerApp/TrackerApp.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = NL8X8WZ4L9;
 				INFOPLIST_FILE = TrackerApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Guardia;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -430,7 +434,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cachemoney613.KitatKonenutTracker;
-				PRODUCT_NAME = TrackerApp;
+				PRODUCT_NAME = Guardia;
 				SWIFT_OBJC_BRIDGING_HEADER = "TrackerApp/TrackerApp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
