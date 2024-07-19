@@ -69,7 +69,7 @@ const UserList: React.FC<UserListProps> = ({ onUserClick, locations, currentTeam
             disabled={!userLocation}
           >
             <ListItemAvatar>
-              <Avatar src={user.image} alt={user.name}>
+              <Avatar src={`${process.env.PUBLIC_URL}${user.image}`} alt={user.name}>
                 {user.name.charAt(0)}
               </Avatar>
             </ListItemAvatar>
