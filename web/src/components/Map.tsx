@@ -128,7 +128,7 @@ const Map: React.FC<MapProps> = ({ locations, focusedLocation, onViewAllUsers })
           title={`User: ${userNames[location.userId] || 'Loading...'}`}
           icon={{
             url: sosUsers.has(location.userId) ? CustomMarker('red') : CustomMarker('blue'),
-            scaledSize: new google.maps.Size(30, 30),
+            scaledSize: new google.maps.Size(50, 50),
           }}
           onClick={() => setSelectedMarker(location)}
         />
