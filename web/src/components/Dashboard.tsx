@@ -15,6 +15,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Location } from '../types';
 import { updateTeamVisibility } from '../services/user';
+import logo from '../images/Guardia Logo Black.svg';
 
 // Define a custom User type that extends FirebaseUser and includes teamId
 interface User extends FirebaseUser {
@@ -161,8 +162,12 @@ const Dashboard: React.FC = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <AppBar position="static">
         <Toolbar>
+          <img src={logo} alt="Logo" width="40px" height="40px" />
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Guardia
+          </Typography>
+          <Typography variant="body1" component="div" sx={{ flexGrow: 1 }}>
+            Team {currentUser.teamId}
           </Typography>
           <Tooltip title="Toggle whether team members can see each other's locations">
             <IconButton color="inherit" onClick={handleToggleTeamLocations}>
