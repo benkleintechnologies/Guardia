@@ -81,7 +81,7 @@ const SOSMessages: React.FC<SOSMessagesProps> = ({ onSosClick, currentTeamId }) 
           onClick={() => onSosClick(sos.latitude, sos.longitude)}
         >
           <ListItemAvatar>
-            <Avatar src={sos.userImage} alt={sos.userName}>
+            <Avatar src={`${process.env.PUBLIC_URL}${sos.userImage}`} alt={sos.userName}>
               {sos.userName.charAt(0)}
             </Avatar>
           </ListItemAvatar>

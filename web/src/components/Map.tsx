@@ -148,7 +148,7 @@ const Map: React.FC<MapProps> = ({ locations, focusedLocation, onViewAllUsers })
         <CustomInfoWindow
           position={{ lat: selectedMarker.latitude, lng: selectedMarker.longitude }}
           onCloseClick={() => setSelectedMarker(null)}
-          userId={selectedMarker.userId}
+          userId={userData[selectedMarker.userId]?.name || 'Unknown'}
           teamId={selectedMarker.teamId}
           userImage={userData[selectedMarker.userId]?.image || ''}
         />

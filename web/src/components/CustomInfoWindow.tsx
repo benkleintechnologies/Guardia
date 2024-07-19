@@ -36,7 +36,7 @@ const CustomInfoWindow: React.FC<CustomInfoWindowProps> = ({ position, onCloseCl
       onCloseClick={onCloseClick}
     >
         <div className="custom-info-window" style={infoWindowStyle}>
-            <Avatar src={userImage} alt={userId} sx={{ mr: 1 }}>
+            <Avatar src={`${process.env.PUBLIC_URL}${userImage}`} alt={userId} sx={{ mr: 1 }}>
               {userId.charAt(0)}
             </Avatar>
             <Box>
