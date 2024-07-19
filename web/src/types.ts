@@ -15,6 +15,7 @@ export interface User {
   teamId: string;
   role: string;
   canViewOthers: boolean;
+  image: string;
 }
 
 export interface SosData {

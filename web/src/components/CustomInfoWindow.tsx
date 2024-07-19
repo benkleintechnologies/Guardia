@@ -1,6 +1,6 @@
 import React from 'react';
 import { InfoWindow } from '@react-google-maps/api';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Avatar } from '@mui/material';
 import '../Map.css';
 
 const infoWindowStyle = {
@@ -22,9 +22,10 @@ interface CustomInfoWindowProps {
     onCloseClick: () => void;
     userId: string;
     teamId: string;
+    userImage: string;
 }
 
-const CustomInfoWindow: React.FC<CustomInfoWindowProps> = ({ position, onCloseClick, userId, teamId }) => {
+const CustomInfoWindow: React.FC<CustomInfoWindowProps> = ({ position, onCloseClick, userId, teamId, userImage }) => {
   return (
     <InfoWindow
       position={position}
@@ -35,6 +36,9 @@ const CustomInfoWindow: React.FC<CustomInfoWindowProps> = ({ position, onCloseCl
       onCloseClick={onCloseClick}
     >
         <div className="custom-info-window" style={infoWindowStyle}>
+            <Avatar src={userImage} alt={userId} sx={{ mr: 1 }}>
+              {userId.charAt(0)}
+            </Avatar>
             <Box>
               <Typography variant="body2">{userId}</Typography>
               <Typography variant="caption">Team: {teamId}</Typography>

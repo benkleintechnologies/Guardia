@@ -4,11 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import { collection, onSnapshot, query, where, orderBy, doc, getDoc, Timestamp } from 'firebase/firestore';
 import { SosData, User } from '../types';
-import { List, ListItem, ListItemText, Typography, Box } from '@mui/material';
+import { List, ListItem, ListItemText, Typography, Box, ListItemAvatar, Avatar } from '@mui/material';
 import ErrorIcon from '@mui/icons-material/Error';
 
 interface SosMessage extends SosData {
   userName: string;
+  userImage: string;
   timestamp: Date;
 }
 
@@ -59,6 +60,7 @@ const SOSMessages: React.FC<SOSMessagesProps> = ({ onSosClick, currentTeamId }) 
             ...data,
             timestamp: date,
             userName: userData?.name || 'Unknown User',
+            userImage: userData?.image || '',
           };
         }));
         setSosMessages(sosData);
@@ -78,7 +80,11 @@ const SOSMessages: React.FC<SOSMessagesProps> = ({ onSosClick, currentTeamId }) 
           button 
           onClick={() => onSosClick(sos.latitude, sos.longitude)}
         >
-          <ErrorIcon color="error" sx={{ mr: 2 }} />
+          <ListItemAvatar>
+            <Avatar src={sos.userImage} alt={sos.userName}>
+              {sos.userName.charAt(0)}
+            </Avatar>
+          </ListItemAvatar>
           <ListItemText
             primary={
               <Typography variant="subtitle1" color="error">
@@ -93,6 +99,7 @@ const SOSMessages: React.FC<SOSMessagesProps> = ({ onSosClick, currentTeamId }) 
               </Box>
             }
           />
+          <ErrorIcon color="error" sx={{ ml: 2 }} />
         </ListItem>
       ))}
     </List>
