@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import { db } from '../firebase';
 import { collection, onSnapshot, doc, getDoc, query, where, orderBy } from 'firebase/firestore';
-import { Location, SosData } from '../types';
+import { Location, SosData, User } from '../types';
 import CustomMarker from './CustomMarker';
 import CustomInfoWindow from './CustomInfoWindow';
 import { Button } from '@mui/material';
@@ -39,8 +39,13 @@ interface MapProps {
   onViewAllUsers: () => void;
 }
 
+interface UserData {
+  name: string;
+  image: string;
+}
+
 const Map: React.FC<MapProps> = ({ locations, focusedLocation, onViewAllUsers }) => {
-  const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
+  const [userData, setUserData] = useState<{ [key: string]: UserData }>({});
   const [sosUsers, setSosUsers] = useState<Set<string>>(new Set());
   const mapRef = useRef<google.maps.Map | null>(null);
   const [selectedMarker, setSelectedMarker] = useState<Location | null>(null);
@@ -75,24 +80,29 @@ const Map: React.FC<MapProps> = ({ locations, focusedLocation, onViewAllUsers })
   }, [isLoaded]);
 
   useEffect(() => {
-    const fetchUserNames = async () => {
+    const fetchUserData = async () => {
       const userIds = locations.map(location => location.userId);
-      const names: { [key: string]: string } = {};
+      const data: { [key: string]: UserData } = {};
       
       for (const userId of userIds) {
         const userDoc = await getDoc(doc(db, 'users', userId));
         if (userDoc.exists()) {
-          names[userId] = userDoc.data().name || 'Unknown';
+          const user = userDoc.data() as User;
+          data[userId] = {
+            name: user.name || 'Unknown',
+            image: user.image || '',
+          };
         }
       }
       
-      setUserNames(names);
+      setUserData(data);
     };
 
     if (locations.length > 0) {
-      fetchUserNames();
+      fetchUserData();
     }
   }, [locations]);
+
 
   // Focus location passed as prop
   useEffect(() => {
@@ -125,21 +135,22 @@ const Map: React.FC<MapProps> = ({ locations, focusedLocation, onViewAllUsers })
         <Marker
           key={location.userId}
           position={{ lat: location.latitude, lng: location.longitude }}
-          title={`User: ${userNames[location.userId] || 'Loading...'}`}
+          title={`User: ${userData[location.userId]?.name || 'Loading...'}`}
           icon={{
             url: sosUsers.has(location.userId) ? CustomMarker('red') : CustomMarker('blue'),
-            scaledSize: new google.maps.Size(30, 30),
+            scaledSize: new google.maps.Size(50, 50),
           }}
           onClick={() => setSelectedMarker(location)}
         />
       ))}
 
-       {selectedMarker && (
+      {selectedMarker && (
         <CustomInfoWindow
           position={{ lat: selectedMarker.latitude, lng: selectedMarker.longitude }}
           onCloseClick={() => setSelectedMarker(null)}
-          userId={userNames[selectedMarker.userId] || 'Loading...'}
+          userId={selectedMarker.userId}
           teamId={selectedMarker.teamId}
+          userImage={userData[selectedMarker.userId]?.image || ''}
         />
       )}
       <Button

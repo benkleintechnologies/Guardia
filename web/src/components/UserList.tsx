@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { User, Location } from '../types';
-import { List, ListItem, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemText, ListItemAvatar, Avatar } from '@mui/material';
 
 interface UserListProps {
   onUserClick: (userId: string) => void;
@@ -68,6 +68,11 @@ const UserList: React.FC<UserListProps> = ({ onUserClick, locations, currentTeam
             onClick={() => onUserClick(user.userId)}
             disabled={!userLocation}
           >
+            <ListItemAvatar>
+              <Avatar src={user.image} alt={user.name}>
+                {user.name.charAt(0)}
+              </Avatar>
+            </ListItemAvatar>
             <ListItemText
               primary={user.name}
               secondary={`Team: ${user.teamId}${userLocation ? '' : ' (No location data)'}`}
